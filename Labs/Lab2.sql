@@ -48,7 +48,7 @@ go
 
 exec dbo.spClientesCidade @City = "Las Vegas";
 
---e) AAAAA
+--e)
 create or alter procedure dbo.spListaCompra @SalesOID int
 as
 	declare @costumerEmail nvarchar(50);
@@ -57,46 +57,26 @@ as
 	declare @total int;
 
 	--Costumer
-	declare CostumerEmail_Cursor cursor
-	for select c.EmailAddress
-		from [SalesLT].[SalesOrderHeader] as h
-		left join [SalesLT].[Customer] as c
-		on h.CustomerID=c.CustomerID
-		where h.SalesOrderID=@SalesOID;
-	open CostumerEmail_Cursor
-	fetch next from CostumerEmail_Cursor into @costumerEmail;
-	close CostumerEmail_Cursor;
-	deallocate CostumerEmail_Cursor;
+	set @costumerEmail = (select c.EmailAddress
+						from [SalesLT].[SalesOrderHeader] as h
+						left join [SalesLT].[Customer] as c
+						on h.CustomerID=c.CustomerID
+						where h.SalesOrderID=@SalesOID);
 	
 	--Order
-	declare OrderID_Cursor cursor
-	for select h.SalesOrderID
-		from [SalesLT].[SalesOrderHeader] as h
-		where h.SalesOrderID=@SalesOID;
-	open OrderID_Cursor
-	fetch next from OrderID_Cursor into @orderID;
-	close OrderID_Cursor;
-	deallocate OrderID_Cursor;
+	set @orderID = (select h.SalesOrderID
+					from [SalesLT].[SalesOrderHeader] as h
+					where h.SalesOrderID=@SalesOID);
 
 	--Date
-	declare Date_Cursor cursor
-	for select h.OrderDate
-		from [SalesLT].[SalesOrderHeader] as h
-		where h.SalesOrderID=@SalesOID;
-	open Date_Cursor
-	fetch next from Date_Cursor into @date;
-	close Date_Cursor;
-	deallocate Date_Cursor;
+	set @date = (select h.OrderDate
+				from [SalesLT].[SalesOrderHeader] as h
+				where h.SalesOrderID=@SalesOID);
 
 	--Total
-	declare Total_Cursor cursor
-	for select sum(OrderQty*UnitPrice)
-		from SalesLT.SalesOrderDetail as h
-		where h.SalesOrderID=@SalesOID;
-	open Total_Cursor
-	fetch next from Total_Cursor into @total;
-	close Total_Cursor;
-	deallocate Total_Cursor;
+	set @total = (select sum(OrderQty*UnitPrice)
+				from SalesLT.SalesOrderDetail as h
+				where h.SalesOrderID=@SalesOID);
 
 	--Print do cabeçalho
 	print '--------------------------------------------'
@@ -107,14 +87,16 @@ as
 
 	--Print da lista de produtos
 	print '--------------------------------------------'
-	declare @salesCount int;
-	
-	set @salesCount = (select COUNT(*)
-						from [SalesLT].[SalesOrderDetail] as d
-						where d.SalesOrderID = @SalesOID
-						group by d.SalesOrderID);
+	declare @salesOrderDetailID int;
 
-	while @salesCount > 0
+	declare SalesOrderDetail_Cursor cursor
+	for select d.SalesOrderDetailID
+		from [SalesLT].[SalesOrderDetail] as d
+		where d.SalesOrderID=@SalesOID;
+	open SalesOrderDetail_Cursor
+	fetch next from SalesOrderDetail_Cursor into @salesOrderDetailID;
+
+	while (@@FETCH_STATUS = 0)
 	begin
 		declare @productName nvarchar(50);
 		declare @saleOrderQty int;
@@ -123,72 +105,51 @@ as
 		declare @saleLineTotal float;
 
 		--Product name
-		declare ProductName_Cursor cursor
-		for select p.Name--
-			from [SalesLT].[SalesOrderDetail] as d
-			left join [SalesLT].Product as p
-			on d.ProductID=p.ProductID
-			where d.SalesOrderID=@SalesOID;
-		open ProductName_Cursor
-		fetch next from ProductName_Cursor into @productName;
+		set @productName = (select p.Name
+							from [SalesLT].[SalesOrderDetail] as d
+							left join [SalesLT].Product as p
+							on d.ProductID=p.ProductID
+							where d.SalesOrderDetailID=@salesOrderDetailID);
 
 		--Sale Order Qty
-		declare SaleOrderQty_Cursor cursor
-		for select d.OrderQty
-			from [SalesLT].[SalesOrderDetail] as d
-			left join [SalesLT].Product as p
-			on d.ProductID=p.ProductID
-			where d.SalesOrderID=@SalesOID;
-		open SaleOrderQty_Cursor
-		fetch next from SaleOrderQty_Cursor into @saleOrderQty;
+		set @saleOrderQty = (select d.OrderQty
+							from [SalesLT].[SalesOrderDetail] as d
+							left join [SalesLT].Product as p
+							on d.ProductID=p.ProductID
+							where d.SalesOrderDetailID=@salesOrderDetailID);
 
 		--Sale Unit Price
-		declare SaleUnitPrice_Cursor cursor
-		for select d.UnitPrice
-			from [SalesLT].[SalesOrderDetail] as d
-			left join [SalesLT].Product as p
-			on d.ProductID=p.ProductID
-			where d.SalesOrderID=@SalesOID;
-		open SaleUnitPrice_Cursor
-		fetch next from SaleUnitPrice_Cursor into @saleUnitPrice;
+		set @saleUnitPrice = (select d.UnitPrice
+							from [SalesLT].[SalesOrderDetail] as d
+							left join [SalesLT].Product as p
+							on d.ProductID=p.ProductID
+							where d.SalesOrderDetailID=@salesOrderDetailID);
 
 		--Sale Unit Price Discount
-		declare SaleUnitPriceDiscount_Cursor cursor
-		for select d.UnitPriceDiscount
-			from [SalesLT].[SalesOrderDetail] as d
-			left join [SalesLT].Product as p
-			on d.ProductID=p.ProductID
-			where d.SalesOrderID=@SalesOID;
-		open SaleUnitPriceDiscount_Cursor
-		fetch next from SaleUnitPriceDiscount_Cursor into @saleUnitPriceDiscount;
+		set @saleUnitPriceDiscount = (select d.UnitPriceDiscount
+									from [SalesLT].[SalesOrderDetail] as d
+									left join [SalesLT].Product as p
+									on d.ProductID=p.ProductID
+									where d.SalesOrderDetailID=@salesOrderDetailID);
 
 		--Sale Line Total
-		declare SaleLineTotal_Cursor cursor
-		for select d.LineTotal
-			from [SalesLT].[SalesOrderDetail] as d
-			left join [SalesLT].Product as p
-			on d.ProductID=p.ProductID
-			where d.SalesOrderID=@SalesOID;
-		open SaleLineTotal_Cursor
-		fetch next from SaleLineTotal_Cursor into @saleLineTotal;
+		set @saleLineTotal = (select d.LineTotal
+							from [SalesLT].[SalesOrderDetail] as d
+							left join [SalesLT].Product as p
+							on d.ProductID=p.ProductID
+							where d.SalesOrderDetailID=@salesOrderDetailID);
 		
 		print 'Product: ' + @productName + ' / OrderQty: ' + cast(@saleOrderQty as varchar(10)) + ' / UnitPrice: ' + cast(@saleUnitPrice as varchar(10)) + ' / UnitPriceDiscount: ' + cast(@saleUnitPriceDiscount as varchar(10)) + ' / Line Total: ' + cast(@saleLineTotal as varchar(10));		
-		close ProductName_Cursor;
-		close SaleOrderQty_Cursor;
-		close SaleUnitPrice_Cursor;
-		close SaleUnitPriceDiscount_Cursor;
-		close SaleLineTotal_Cursor;
-		deallocate ProductName_Cursor;
-		deallocate SaleOrderQty_Cursor;
-		deallocate SaleUnitPrice_Cursor;
-		deallocate SaleUnitPriceDiscount_Cursor;
-		deallocate SaleLineTotal_Cursor;
 
-		set @salesCount = @salesCount  - 1;
+		fetch next from SalesOrderDetail_Cursor into @salesOrderDetailID;
 	end
+
+	close SalesOrderDetail_Cursor;
+	deallocate SalesOrderDetail_Cursor;
 go
 
 exec dbo.spListaCompra @SalesOID = 71863;
+
 Etapa 2
 --a)
 create or alter function dbo.fnCodificaPassword (@password nvarchar(10))
@@ -210,7 +171,7 @@ CREATE TABLE CustomerPW (
 	Password nvarchar(255)
 );
 
---c AAAAAAAAA
+--c
 create or alter procedure dbo.spNovoCliente @ID int, @NameStyle bit, @FirstName nvarchar(50), @LastName nvarchar(50), @email nvarchar(50), @Password nvarchar(10)
 as
 	SET IDENTITY_INSERT SalesLT.Customer ON
@@ -220,7 +181,7 @@ as
 	insert into dbo.CustomerPW (ID, Password) values (@ID, (select dbo.fnCodificaPassword(@Password)));
 go
 
-exec dbo.spNovoCliente @ID=5000, @NameStyle=0, @FirstName='Nuno', @LastName='Reis', @email='nunoreis294@gmail.com', @Password='123abc.';
+exec dbo.spNovoCliente @ID=8, @NameStyle=0, @FirstName='Nuno', @LastName='Reis', @email='nunoreis294@gmail.com', @Password='123abc.';
 
 --d
 create or alter function dbo.fnAutenticar (@email nvarchar(50), @password nvarchar(10))
@@ -244,42 +205,18 @@ Etapa 3
 --a)
 create schema Logs;
 
-create or alter table Logs.CustomerLog ([CustomerID] [int] IDENTITY(1,1) NOT FOR REPLICATION NOT NULL,
-	[NameStyle] [dbo].[NameStyle] NOT NULL,
-	[Title] [nvarchar](8) NULL,
-	[FirstName] [dbo].[Name] NOT NULL,
-	[MiddleName] [dbo].[Name] NULL,
-	[LastName] [dbo].[Name] NOT NULL,
-	[Suffix] [nvarchar](10) NULL,
-	[CompanyName] [nvarchar](128) NULL,
-	[SalesPerson] [nvarchar](256) NULL,
-	[EmailAddress] [nvarchar](50) NULL,
-	[Phone] [dbo].[Phone] NULL,
-	[PasswordHash] [varchar](128) NOT NULL,
-	[PasswordSalt] [varchar](10) NOT NULL,
-	[rowguid] [uniqueidentifier] ROWGUIDCOL  NOT NULL,
-	[ModifiedDate] [datetime] NOT NULL,
-	Log_Data timestamp,
-	Log_Operacao char
- CONSTRAINT [PK_Customer_CustomerID] PRIMARY KEY CLUSTERED
-(
-	[CustomerID] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
- CONSTRAINT [AK_Customer_rowguid] UNIQUE NONCLUSTERED 
-(
-	[rowguid] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
 
-ALTER TABLE Logs.CustomerLog ADD  CONSTRAINT [DF_Customer_NameStyle]  DEFAULT ((0)) FOR [NameStyle]
-GO
+/*	Log_Data timestamp,
+	Log_Operacao char*/
 
-ALTER TABLE Logs.CustomerLog ADD  CONSTRAINT [DF_Customer_rowguid]  DEFAULT (newid()) FOR [rowguid]
-GO
+create table Logs.CustomerLog
+as select *
+from SalesLT.Customer;
 
-ALTER TABLE Logs.CustomerLog ADD  CONSTRAINT [DF_Customer_ModifiedDate]  DEFAULT (getdate()) FOR [ModifiedDate]
-GO
+drop table Logs.CustomerLog
+
+select *
+from Logs.CustomerLog
 
 
 

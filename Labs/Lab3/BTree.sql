@@ -3,12 +3,12 @@ Mostrar Exemplo de B+ Tree no SQL Server
 ****************************/
 -- Criar tabela em que 1 registo
 -- ocupa uma p�gina
-Create table TesteIndices (
+/*Create table TesteIndices (
 	id int identity(1,1),
 	desc1	char(4000),
 	desc2	char(4000),
 	num int)
-go
+go*/
 
 -- N�o existem indices
 -- A tabela � um Heap

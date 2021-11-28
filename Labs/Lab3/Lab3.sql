@@ -94,9 +94,14 @@ WHERE c.LastName LIKE 'A%';
 
 SELECT c.LastName , c.FirstName, c.EmailAddress
 FROM SalesLT.Customer c
-ORDER BY c.LastNameCREATE NONCLUSTERED INDEX NONCI_lastName   
+ORDER BY c.LastName
+
+CREATE NONCLUSTERED INDEX NONCI_lastName   
     ON SalesLT.Customer (LastName);   
-GO--Ambas as querys usam o LastName ou para ordenar ou para selecionar 
+GO
+
+--Ambas as querys usam o LastName ou para ordenar ou para selecionar 
+
 
 Etapa 3
 --1)
@@ -120,7 +125,7 @@ Etapa 3
 */
 
 /*b)
-	Colocava na coluna Phone porque é necessario ordenar menos dados
+	Colocava na coluna Phone porque é necessario ordenar menos dados logo é mais rapida e eficiente
 */
 
 --2)
@@ -134,5 +139,8 @@ WHERE SalesPerson LIKE 'adventure-works\david%'
 
 --2)
 
-
 --3)
+/*
+	A melhoria estimada é de 88%
+	Faz sentido implementar o índice sugerido porque 
+*/

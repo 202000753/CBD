@@ -265,6 +265,361 @@ BEGIN
 END
 go
 
+--Media de notas no ano letivo por escola
+create or alter procedure dbo.spMediaNotasPorEscola
+as
+	declare @school nvarchar(30);
+	declare @sum float;
+	declare @average float;
+	declare @count int;
+	set @sum = 0;
+	set @count = 0;
+	set @average = 0;
+
+	declare School_Cursor cursor
+	for select Name
+		from ActiveData.School;
+	open School_Cursor
+	fetch next from School_Cursor into @school;
+
+	while (@@FETCH_STATUS = 0)
+	begin
+		set @sum = (select sum(P1_grade)+sum(P2_grade)+sum(P3_grade)
+					from ActiveData.Current_Course c
+					join (select st.StudentID
+						from ActiveData.Student st
+						join ActiveData.School sc
+						on st.SchoolID=sc.SchoolID
+						where sc.Name like @school) tb
+					on tb.StudentID=c.StudentID)
+
+		set @count = (select count(P1_grade)
+					from ActiveData.Current_Course c
+					join (select st.StudentID
+						from ActiveData.Student st
+						join ActiveData.School sc
+						on st.SchoolID=sc.SchoolID
+						where sc.Name like @school) tb
+					on tb.StudentID=c.StudentID
+					where c.P1_grade is not null) + (select count(P2_grade)
+													from ActiveData.Current_Course c
+													join (select st.StudentID
+														from ActiveData.Student st
+														join ActiveData.School sc
+														on st.SchoolID=sc.SchoolID
+														where sc.Name like @school) tb
+													on tb.StudentID=c.StudentID
+													where c.P2_grade is not null) + (select count(P3_grade)
+																					from ActiveData.Current_Course c
+																					join (select st.StudentID
+																						from ActiveData.Student st
+																						join ActiveData.School sc
+																						on st.SchoolID=sc.SchoolID
+																						where sc.Name like @school) tb
+																					on tb.StudentID=c.StudentID
+																					where c.P3_grade is not null);
+																
+		if (@count > 0)
+			set @average = @sum / @count;
+		print 'Media de notas da escola ' + @school + ': ' + cast(@average as varchar(10));
+		print ' ';
+
+		set @sum = 0;
+		set @count = 0;
+		set @average = 0;
+		fetch next from School_Cursor into @school;
+	end
+
+	close School_Cursor;
+	deallocate School_Cursor;
+go
+
+exec dbo.spMediaNotasPorEscola;
+
+--Média de notas por ano letivo e período letivo por escola
+create or alter procedure dbo.spMediaNotasPorEscolaPorPeriodo
+as
+	declare @school nvarchar(30);
+	declare @sum float;
+	declare @average float;
+	declare @count int;
+	declare @period int;
+	set @sum = 0;
+	set @count = 0;
+	set @average = 0;
+
+	declare School_Cursor cursor
+	for select Name
+		from ActiveData.School;
+	open School_Cursor
+	fetch next from School_Cursor into @school;
+
+	while (@@FETCH_STATUS = 0)
+	begin
+		set @sum = (select sum(P1_grade)
+					from ActiveData.Current_Course c
+					join (select st.StudentID
+						from ActiveData.Student st
+						join ActiveData.School sc
+						on st.SchoolID=sc.SchoolID
+						where sc.Name like @school) tb
+					on tb.StudentID=c.StudentID)
+
+		set @count = (select count(P1_grade)
+					from ActiveData.Current_Course c
+					join (select st.StudentID
+						from ActiveData.Student st
+						join ActiveData.School sc
+						on st.SchoolID=sc.SchoolID
+						where sc.Name like @school) tb
+					on tb.StudentID=c.StudentID
+					where c.P1_grade is not null);
+												
+		if (@count > 0)
+			set @average = @sum / @count;
+		print 'Media de notas da escola ' + @school + ' no 1º periodo: ' + cast(@average as varchar(10));
+		print ' ';
+
+		set @sum = 0;
+		set @count = 0;
+		set @average = 0;
+
+		set @sum = (select sum(P2_grade)
+					from ActiveData.Current_Course c
+					join (select st.StudentID
+						from ActiveData.Student st
+						join ActiveData.School sc
+						on st.SchoolID=sc.SchoolID
+						where sc.Name like @school) tb
+					on tb.StudentID=c.StudentID)
+
+		set @count = (select count(P2_grade)
+					from ActiveData.Current_Course c
+					join (select st.StudentID
+						from ActiveData.Student st
+						join ActiveData.School sc
+						on st.SchoolID=sc.SchoolID
+						where sc.Name like @school) tb
+					on tb.StudentID=c.StudentID
+					where c.P2_grade is not null);
+												
+		if (@count > 0)
+			set @average = @sum / @count;
+		print 'Media de notas da escola ' + @school + ' no 2º periodo: ' + cast(@average as varchar(10));
+		print ' ';
+
+		set @sum = 0;
+		set @count = 0;
+		set @average = 0;
+
+		set @sum = (select sum(P3_grade)
+					from ActiveData.Current_Course c
+					join (select st.StudentID
+						from ActiveData.Student st
+						join ActiveData.School sc
+						on st.SchoolID=sc.SchoolID
+						where sc.Name like @school) tb
+					on tb.StudentID=c.StudentID)
+
+		set @count = (select count(P3_grade)
+					from ActiveData.Current_Course c
+					join (select st.StudentID
+						from ActiveData.Student st
+						join ActiveData.School sc
+						on st.SchoolID=sc.SchoolID
+						where sc.Name like @school) tb
+					on tb.StudentID=c.StudentID
+					where c.P3_grade is not null);
+												
+		if (@count > 0)
+			set @average = @sum / @count;
+		print 'Media de notas da escola ' + @school + ' no 3º periodo: ' + cast(@average as varchar(10));
+		print ' ';
+
+		set @sum = 0;
+		set @count = 0;
+		set @average = 0;
+		fetch next from School_Cursor into @school;
+	end
+
+	close School_Cursor;
+	deallocate School_Cursor;
+go
+
+exec dbo.spMediaNotasPorEscolaPorPeriodo;
+
+--Lançar Nota
+create or alter procedure dbo.spLancarNota @student nvarchar(30), @subject nvarchar(30), @period int, @grade float
+as
+	declare @studentID int
+	declare @subjectID int
+
+	set @studentID = (select s.StudentId
+					from ActiveData.Student s
+					join ActiveData.Sys_User u
+					on s.UserID=u.UserID
+					where u.Name like @student);
+
+	set @subjectID = (select SubjectID
+					from ActiveData.Subject
+					where Name like @subject);
+
+	if(@period = 1)
+		if((select P1_grade
+			from ActiveData.Current_Course
+			where StudentID=@studentID and SubjectID=@subjectID) is null)
+			update ActiveData.Current_Course
+			set P1_grade = @grade
+			where StudentID=@studentID and SubjectID=@subjectID;
+		else
+			print 'Nota já Lançada'
+	if(@period = 2)
+		if((select P2_grade
+			from ActiveData.Current_Course
+			where StudentID=@studentID and SubjectID=@subjectID) is null)
+			update ActiveData.Current_Course
+			set P2_grade = @grade
+			where StudentID=@studentID and SubjectID=@subjectID;
+		else
+			print 'Nota já Lançada'
+	if(@period = 3)
+		if((select P3_grade
+			from ActiveData.Current_Course
+			where StudentID=@studentID and SubjectID=@subjectID) is null)
+			update ActiveData.Current_Course
+			set P3_grade = @grade
+			where StudentID=@studentID and SubjectID=@subjectID;
+		else
+			print 'Nota já Lançada'
+go
+
+exec dbo.spLancarNota @student='Nuno Reis', @subject='MAT-2', @period=1, @grade=15;
+
+--Inscrever aluno numa disciplina
+create or alter procedure dbo.spInscreverAluno @student nvarchar(30), @subject nvarchar(30)
+as
+	declare @studentID int
+	declare @subjectID int
+
+	set @studentID = (select s.StudentId
+					from ActiveData.Student s
+					join ActiveData.Sys_User u
+					on s.UserID=u.UserID
+					where u.Name like @student);
+
+	set @subjectID = (select SubjectID
+					from ActiveData.Subject
+					where Name like @subject);
+
+	
+	INSERT INTO ActiveData.Current_Course(SubjectID, StudentID) values (@subjectID, @studentID)
+go
+
+exec dbo.spInscreverAluno @student='Nuno Reis', @subject='MAT-2';
+
+--Atualizar Nota
+create or alter procedure dbo.spAtualizarNota @student nvarchar(30), @subject nvarchar(30), @period int, @grade float
+as
+	declare @studentID int
+	declare @subjectID int
+
+	set @studentID = (select s.StudentId
+					from ActiveData.Student s
+					join ActiveData.Sys_User u
+					on s.UserID=u.UserID
+					where u.Name like @student);
+
+	set @subjectID = (select SubjectID
+					from ActiveData.Subject
+					where Name like @subject);
+
+	if(@period = 1)
+		if((select P1_grade
+			from ActiveData.Current_Course
+			where StudentID=@studentID and SubjectID=@subjectID) is not null)
+			update ActiveData.Current_Course
+			set P1_grade = @grade
+			where StudentID=@studentID and SubjectID=@subjectID;
+		else
+			print 'Nota não Lançada'
+	if(@period = 2)
+		if((select P2_grade
+			from ActiveData.Current_Course
+			where StudentID=@studentID and SubjectID=@subjectID) is not null)
+			update ActiveData.Current_Course
+			set P2_grade = @grade
+			where StudentID=@studentID and SubjectID=@subjectID;
+		else
+			print 'Nota não Lançada'
+	if(@period = 3)
+		if((select P3_grade
+			from ActiveData.Current_Course
+			where StudentID=@studentID and SubjectID=@subjectID) is not null)
+			update ActiveData.Current_Course
+			set P3_grade = @grade
+			where StudentID=@studentID and SubjectID=@subjectID;
+		else
+			print 'Nota não Lançada'
+go
+
+exec dbo.spAtualizarNota @student='Nuno Reis', @subject='MAT-2', @period=3, @grade=20;
+
+--Total de alunos inscritos em cada uma das disciplinas no ano aberto face ao ano
+--anterior e a respetiva taxa de crescimento.
+create or alter procedure dbo.spTotalAlunosInscritos
+as
+	declare @totalAlunos int;
+	declare @taxaCrescimento float;
+	declare @subject nvarchar(30);
+	set @taxaCrescimento = 0;
+	set @totalAlunos = 0;
+
+	declare Subject_Cursor cursor
+	for select Name
+		from ActiveData.Subject;
+	open Subject_Cursor
+	fetch next from Subject_Cursor into @subject;
+
+	while (@@FETCH_STATUS = 0)
+	begin
+		print 'Disciplina: ' + @subject;
+
+		set @totalAlunos = (select count(*)
+							from ActiveData.Current_Course c
+							join ActiveData.Subject s
+							on s.SubjectID=c.SubjectID
+							where s.Name like @subject)
+
+		print 'Total de alunos inscritos: ' + cast(@totalAlunos as varchar(10));
+		print 'Taxa de crescimento: ' + cast(@taxaCrescimento as varchar(10));
+
+		print ' '	
+		set @totalAlunos = 0;
+		set @taxaCrescimento = 0;
+		fetch next from Subject_Cursor into @subject;
+	end
+
+	close Subject_Cursor;
+	deallocate Subject_Cursor;
+go
+
+exec dbo.spTotalAlunosInscritos
+
+--Média de notas de todos os anos por escola num determinado ano e a respetiva taxa de
+--crescimento face ao ano anterior.
+create or alter procedure dbo.spMediaNotasPorEscolaPorAnoLetivo
+as
+	
+go
+
+exec dbo.spMediaNotasPorEscolaPorAnoLetivo
+
+
+/*Consultar nota - aluno e EE (email e password)
+Recuperar password
+Alterar password
+
+Total de alunos por escola/ano letivo*/
 --*/
 
 

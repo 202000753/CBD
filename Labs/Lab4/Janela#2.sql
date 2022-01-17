@@ -12,6 +12,8 @@ SELECT EmailAddress
 FROM dbo.Customer
 WHERE CustomerId = 5
 
+--ou
+
 SELECT EmailAddress
 FROM dbo.Customer (NOLOCK)
 WHERE CustomerId = 5
@@ -29,6 +31,13 @@ BEGIN TRAN
 UPDATE dbo.Customer
 SET EmailAddress = 'aaaaaaa@aaaaa.aaaaaaaa'
 WHERE CustomerId = 5
+COMMIT
+
+--3)
+BEGIN TRAN
+INSERT INTO dbo.Customer
+VALUES (0, 'Mr.', 'FirstName', null, 'LastName', null, 'CompanyName',
+'SalesPerson','EmailAdress','Phone','','',NEWID(),GETDATE());
 COMMIT
 
 Etapa 3

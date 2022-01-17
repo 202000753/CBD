@@ -2,7 +2,7 @@ Etapa 1
 --1)
 BEGIN TRANSACTION
 UPDATE dbo.Customer
-SET EmailAddress = 'new@estsetubal.ips.pt.pt'
+SET EmailAddress = 'aaa.ips.pt.pt'
 WHERE CustomerId = 5
 
 --2)
@@ -35,15 +35,15 @@ SET NOCOUNT ON
 GO
 BEGIN TRAN
 
-SELECT EmailAddress
+SELECT COUNT(*)
 FROM dbo.Customer
-WHERE CustomerId = 5
+--WHERE CustomerId = 5
 
 WAITFOR DELAY '00:00:10'
 
-SELECT EmailAddress
+SELECT COUNT(*)
 FROM dbo.Customer
-WHERE CustomerId = 5
+--WHERE CustomerId = 5
 
 COMMIT TRAN
 

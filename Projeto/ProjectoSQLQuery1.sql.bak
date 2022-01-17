@@ -1,21 +1,22 @@
 --drop database ProjectoCBD
+/*
 create database ProjectoCBD
 go
 use ProjectoCBD
 go
-
+--FALTA CRIAR SCHEMAS
 create schema OldData;
 go
 create schema ActiveData;
 go
 create schema ArchiveData;
 go
-
+--*/
+/*
 create table ActiveData.Subject(
 	SubjectID int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	Name nvarchar(40) NOT NULL
 )
-
 create table ActiveData.Address(
 	AddressID int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	AddressLine1 nvarchar (60) NOT NULL,
@@ -25,7 +26,6 @@ create table ActiveData.Address(
 	CountryRegion nvarchar (50) NOT NULL,
 	PostalCode nvarchar (15) NOT NULL
 )
-
 create table ActiveData.Sys_User(
 	UserID int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	Name nvarchar (60) NOT NULL,
@@ -33,7 +33,6 @@ create table ActiveData.Sys_User(
 	Password nvarchar (35) NOT NULL,
 	LastAccess datetime
 )
-
 create table ActiveData.UserAddress(
 	UserID int NOT NULL FOREIGN KEY REFERENCES ActiveData.Sys_User (UserID),
 	AddressID int NOT NULL FOREIGN KEY REFERENCES ActiveData.Address (AddressID),
@@ -41,17 +40,14 @@ create table ActiveData.UserAddress(
 	AddressType bit NOT NULL -- Urban 0, Rural 1 
 	PRIMARY KEY (UserID, AddressID)
 )	
-
 create table ActiveData.School(
 	SchoolID int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	Name nvarchar(40) NOT NULL,
 )
-
 create table ActiveData.Guardian(
 	GuardianID int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	UserID int NOT NULL foreign key references ActiveData.Sys_User(UserID)
 )
-
 create table ActiveData.Student (
 	StudentID int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	UserID int NOT NULL foreign key references ActiveData.Sys_User (UserID),
@@ -83,8 +79,7 @@ create table ActiveData.Student (
 	Health tinyint,
 	SchoolID int NOT NULL foreign key references ActiveData.School (SchoolID),
 	GuardianID int foreign key references ActiveData.Guardian(GuardianID)
-)
-
+	)
 create table ActiveData.Student_MultiLanguage (
 	StudentID int NOT NULL,
 	Lang nvarchar (5) NOT NULL,
@@ -94,7 +89,6 @@ create table ActiveData.Student_MultiLanguage (
 	Guardian_Relation nvarchar (20)
 	PRIMARY KEY (StudentID, Lang)
 )
-
 create table ArchiveData.Cloosed_Course(
 	SchoolYear smallint NOT NULL ,
 	SubjectID int NOT NULL foreign key references ActiveData.Subject (SubjectID),
@@ -106,7 +100,6 @@ create table ArchiveData.Cloosed_Course(
 	P3_grade tinyint,
 	PRIMARY KEY(SchoolYear, SubjectID, StudentID)
 )
-
 create table ActiveData.Current_Course(
 	SubjectID int NOT NULL foreign key references ActiveData.Subject (SubjectID),
 	StudentID int NOT NULL foreign key references ActiveData.Student (StudentID),
@@ -117,15 +110,13 @@ create table ActiveData.Current_Course(
 	P3_grade tinyint,
 	PRIMARY KEY(SubjectID, StudentID)
 )
+--*/
 
-CREATE TABLE servidorMail(
-	mailID int IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	mailReceiver nvarchar (70) NOT NULL,
-	tokenNumber nvarchar (10) NOT NULL,
-	mailDateTime datetime NOT NULL
-)
 
 ------STORED PROCEDURES/ FUNCTIONS
+
+/*
+
 CREATE FUNCTION fnHashPassword (@password NVARCHAR(32))
 Returns NVARCHAR(32)
 AS
@@ -133,7 +124,11 @@ AS
 		return HASHBYTES('SHA1', @password)
 	END
 
-CREATE or alter procedure PROCEDURE insertNewStudent (@mail nvarchar(70),
+--*/
+
+/*
+
+CREATE PROCEDURE insertNewStudent (@mail nvarchar(70),
 									@name nvarchar (60),
 									@gender nvarchar,
 									@birthdate datetime,
@@ -193,24 +188,27 @@ select CURRENT_TIMESTAMP
 --select * from ActiveData.Address
 
 
-CREATE or alter procedure PROCEDURE insertNewSubject (@name nvarchar (60))
+CREATE PROCEDURE insertNewSubject (@name nvarchar (60))
 as
 insert into ActiveData.Subject (Name) values (@name)
 go
 
-CREATE or alter procedure PROCEDURE insertRowCloosed_Course (@SchoolYear smallint,	@SubjectID int,	@StudentID int, @Failures tinyint, @Absences tinyint, @P1_grade tinyint, @P2_grade tinyint, @P3_grade tinyint)
+CREATE PROCEDURE insertRowCloosed_Course (@SchoolYear smallint,	@SubjectID int,	@StudentID int, @Failures tinyint, @Absences tinyint, @P1_grade tinyint, @P2_grade tinyint, @P3_grade tinyint)
 as
 insert into ArchiveData.Cloosed_Course (SchoolYear, SubjectID, StudentID, Failures, Absences, P1_grade, P2_grade, P3_grade) values (@SchoolYear,	@SubjectID,	@StudentID, @Failures, @Absences, @P1_grade, @P2_grade, @P3_grade)
 go
 
-CREATE or alter procedure PROCEDURE registerStudentInSubject (@studentID int, @subjectID int, @failures tinyint) --REGISTA UM ALUNO EM UMA DISCIPLINA NO ANO ACTUAL
+
+
+CREATE PROCEDURE registerStudentInSubject (@studentID int, @subjectID int, @failures tinyint) --REGISTA UM ALUNO EM UMA DISCIPLINA NO ANO ACTUAL
 as
 BEGIN
 	insert into ActiveData.Current_Course (SubjectID, StudentID, Failures , Absences, P1_grade, P2_grade, P3_grade) values (@subjectID, @studentID, @failures, 0, NULL,NULL,NULL)
 END
 go
 
-CREATE or alter procedure PROCEDURE startSchoolYear (@year smallint)
+
+CREATE PROCEDURE startSchoolYear (@year smallint)
 as
 BEGIN
 	SELECT *
@@ -257,7 +255,8 @@ BEGIN
 END
 GO
 
-CREATE or alter procedure PROCEDURE endSchoolYear (@year smallint) --FECHA O ANO ESCOLAR, RECEBE O ANO
+
+CREATE PROCEDURE endSchoolYear (@year smallint) --FECHA O ANO ESCOLAR, RECEBE O ANO
 as
 BEGIN
 	insert into ArchiveData.Cloosed_Course (SchoolYear, SubjectID, StudentID, Failures , Absences, P1_grade, P2_grade, P3_grade)
@@ -266,491 +265,15 @@ BEGIN
 END
 go
 
---Media de notas no ano letivo por escola
-create or alter procedure dbo.spMediaNotasPorEscola
-as
-	declare @school nvarchar(30);
-	declare @sum float;
-	declare @average float;
-	declare @count int;
-	set @sum = 0;
-	set @count = 0;
-	set @average = 0;
-
-	declare School_Cursor cursor
-	for select Name
-		from ActiveData.School;
-	open School_Cursor
-	fetch next from School_Cursor into @school;
-
-	while (@@FETCH_STATUS = 0)
-	begin
-		set @sum = (select sum(P1_grade)+sum(P2_grade)+sum(P3_grade)
-					from ActiveData.Current_Course c
-					join (select st.StudentID
-						from ActiveData.Student st
-						join ActiveData.School sc
-						on st.SchoolID=sc.SchoolID
-						where sc.Name like @school) tb
-					on tb.StudentID=c.StudentID)
-
-		set @count = (select count(P1_grade)
-					from ActiveData.Current_Course c
-					join (select st.StudentID
-						from ActiveData.Student st
-						join ActiveData.School sc
-						on st.SchoolID=sc.SchoolID
-						where sc.Name like @school) tb
-					on tb.StudentID=c.StudentID
-					where c.P1_grade is not null) + (select count(P2_grade)
-													from ActiveData.Current_Course c
-													join (select st.StudentID
-														from ActiveData.Student st
-														join ActiveData.School sc
-														on st.SchoolID=sc.SchoolID
-														where sc.Name like @school) tb
-													on tb.StudentID=c.StudentID
-													where c.P2_grade is not null) + (select count(P3_grade)
-																					from ActiveData.Current_Course c
-																					join (select st.StudentID
-																						from ActiveData.Student st
-																						join ActiveData.School sc
-																						on st.SchoolID=sc.SchoolID
-																						where sc.Name like @school) tb
-																					on tb.StudentID=c.StudentID
-																					where c.P3_grade is not null);
-																
-		if (@count > 0)
-			set @average = @sum / @count;
-		print 'Media de notas da escola ' + @school + ': ' + cast(@average as varchar(10));
-		print ' ';
-
-		set @sum = 0;
-		set @count = 0;
-		set @average = 0;
-		fetch next from School_Cursor into @school;
-	end
-
-	close School_Cursor;
-	deallocate School_Cursor;
-go
-
-exec dbo.spMediaNotasPorEscola;
-
---Média de notas por ano letivo e período letivo por escola
-create or alter procedure dbo.spMediaNotasPorEscolaPorPeriodo
-as
-	declare @school nvarchar(30);
-	declare @sum float;
-	declare @average float;
-	declare @count int;
-	declare @period int;
-	set @sum = 0;
-	set @count = 0;
-	set @average = 0;
-
-	declare School_Cursor cursor
-	for select Name
-		from ActiveData.School;
-	open School_Cursor
-	fetch next from School_Cursor into @school;
-
-	while (@@FETCH_STATUS = 0)
-	begin
-		set @sum = (select sum(P1_grade)
-					from ActiveData.Current_Course c
-					join (select st.StudentID
-						from ActiveData.Student st
-						join ActiveData.School sc
-						on st.SchoolID=sc.SchoolID
-						where sc.Name like @school) tb
-					on tb.StudentID=c.StudentID)
-
-		set @count = (select count(P1_grade)
-					from ActiveData.Current_Course c
-					join (select st.StudentID
-						from ActiveData.Student st
-						join ActiveData.School sc
-						on st.SchoolID=sc.SchoolID
-						where sc.Name like @school) tb
-					on tb.StudentID=c.StudentID
-					where c.P1_grade is not null);
-												
-		if (@count > 0)
-			set @average = @sum / @count;
-		print 'Media de notas da escola ' + @school + ' no 1º periodo: ' + cast(@average as varchar(10));
-		print ' ';
-
-		set @sum = 0;
-		set @count = 0;
-		set @average = 0;
-
-		set @sum = (select sum(P2_grade)
-					from ActiveData.Current_Course c
-					join (select st.StudentID
-						from ActiveData.Student st
-						join ActiveData.School sc
-						on st.SchoolID=sc.SchoolID
-						where sc.Name like @school) tb
-					on tb.StudentID=c.StudentID)
-
-		set @count = (select count(P2_grade)
-					from ActiveData.Current_Course c
-					join (select st.StudentID
-						from ActiveData.Student st
-						join ActiveData.School sc
-						on st.SchoolID=sc.SchoolID
-						where sc.Name like @school) tb
-					on tb.StudentID=c.StudentID
-					where c.P2_grade is not null);
-												
-		if (@count > 0)
-			set @average = @sum / @count;
-		print 'Media de notas da escola ' + @school + ' no 2º periodo: ' + cast(@average as varchar(10));
-		print ' ';
-
-		set @sum = 0;
-		set @count = 0;
-		set @average = 0;
-
-		set @sum = (select sum(P3_grade)
-					from ActiveData.Current_Course c
-					join (select st.StudentID
-						from ActiveData.Student st
-						join ActiveData.School sc
-						on st.SchoolID=sc.SchoolID
-						where sc.Name like @school) tb
-					on tb.StudentID=c.StudentID)
-
-		set @count = (select count(P3_grade)
-					from ActiveData.Current_Course c
-					join (select st.StudentID
-						from ActiveData.Student st
-						join ActiveData.School sc
-						on st.SchoolID=sc.SchoolID
-						where sc.Name like @school) tb
-					on tb.StudentID=c.StudentID
-					where c.P3_grade is not null);
-												
-		if (@count > 0)
-			set @average = @sum / @count;
-		print 'Media de notas da escola ' + @school + ' no 3º periodo: ' + cast(@average as varchar(10));
-		print ' ';
-
-		set @sum = 0;
-		set @count = 0;
-		set @average = 0;
-		fetch next from School_Cursor into @school;
-	end
-
-	close School_Cursor;
-	deallocate School_Cursor;
-go
-
-exec dbo.spMediaNotasPorEscolaPorPeriodo;
-
---Lançar Nota
-create or alter procedure dbo.spLancarNota @student nvarchar(30), @subject nvarchar(30), @period int, @grade float
-as
-	declare @studentID int
-	declare @subjectID int
-
-	set @studentID = (select s.StudentId
-					from ActiveData.Student s
-					join ActiveData.Sys_User u
-					on s.UserID=u.UserID
-					where u.Name like @student);
-
-	set @subjectID = (select SubjectID
-					from ActiveData.Subject
-					where Name like @subject);
-
-	if(@period = 1)
-		if((select P1_grade
-			from ActiveData.Current_Course
-			where StudentID=@studentID and SubjectID=@subjectID) is null)
-			update ActiveData.Current_Course
-			set P1_grade = @grade
-			where StudentID=@studentID and SubjectID=@subjectID;
-		else
-			print 'Nota já Lançada'
-	if(@period = 2)
-		if((select P2_grade
-			from ActiveData.Current_Course
-			where StudentID=@studentID and SubjectID=@subjectID) is null)
-			update ActiveData.Current_Course
-			set P2_grade = @grade
-			where StudentID=@studentID and SubjectID=@subjectID;
-		else
-			print 'Nota já Lançada'
-	if(@period = 3)
-		if((select P3_grade
-			from ActiveData.Current_Course
-			where StudentID=@studentID and SubjectID=@subjectID) is null)
-			update ActiveData.Current_Course
-			set P3_grade = @grade
-			where StudentID=@studentID and SubjectID=@subjectID;
-		else
-			print 'Nota já Lançada'
-go
-
-exec dbo.spLancarNota @student='Nuno Reis', @subject='MAT-2', @period=1, @grade=15;
-
---Inscrever aluno numa disciplina
-create or alter procedure dbo.spInscreverAluno @student nvarchar(30), @subject nvarchar(30)
-as
-	declare @studentID int
-	declare @subjectID int
-
-	set @studentID = (select s.StudentId
-					from ActiveData.Student s
-					join ActiveData.Sys_User u
-					on s.UserID=u.UserID
-					where u.Name like @student);
-
-	set @subjectID = (select SubjectID
-					from ActiveData.Subject
-					where Name like @subject);
-
-	
-	INSERT INTO ActiveData.Current_Course(SubjectID, StudentID) values (@subjectID, @studentID)
-go
-
-exec dbo.spInscreverAluno @student='Nuno Reis', @subject='MAT-2';
-
---Atualizar Nota
-create or alter procedure dbo.spAtualizarNota @student nvarchar(30), @subject nvarchar(30), @period int, @grade float
-as
-	declare @studentID int
-	declare @subjectID int
-
-	set @studentID = (select s.StudentId
-					from ActiveData.Student s
-					join ActiveData.Sys_User u
-					on s.UserID=u.UserID
-					where u.Name like @student);
-
-	set @subjectID = (select SubjectID
-					from ActiveData.Subject
-					where Name like @subject);
-
-	if(@period = 1)
-		if((select P1_grade
-			from ActiveData.Current_Course
-			where StudentID=@studentID and SubjectID=@subjectID) is not null)
-			update ActiveData.Current_Course
-			set P1_grade = @grade
-			where StudentID=@studentID and SubjectID=@subjectID;
-		else
-			print 'Nota não Lançada'
-	if(@period = 2)
-		if((select P2_grade
-			from ActiveData.Current_Course
-			where StudentID=@studentID and SubjectID=@subjectID) is not null)
-			update ActiveData.Current_Course
-			set P2_grade = @grade
-			where StudentID=@studentID and SubjectID=@subjectID;
-		else
-			print 'Nota não Lançada'
-	if(@period = 3)
-		if((select P3_grade
-			from ActiveData.Current_Course
-			where StudentID=@studentID and SubjectID=@subjectID) is not null)
-			update ActiveData.Current_Course
-			set P3_grade = @grade
-			where StudentID=@studentID and SubjectID=@subjectID;
-		else
-			print 'Nota não Lançada'
-go
-
-exec dbo.spAtualizarNota @student='Nuno Reis', @subject='MAT-2', @period=3, @grade=20;
-
---Total de alunos inscritos em cada uma das disciplinas no ano aberto face ao ano
---anterior e a respetiva taxa de crescimento.
-create or alter procedure dbo.spTotalAlunosInscritos
-as
-	declare @totalAlunos int;
-	declare @taxaCrescimento float;
-	declare @subject nvarchar(30);
-	set @taxaCrescimento = 0;
-	set @totalAlunos = 0;
-
-	declare Subject_Cursor cursor
-	for select Name
-		from ActiveData.Subject;
-	open Subject_Cursor
-	fetch next from Subject_Cursor into @subject;
-
-	while (@@FETCH_STATUS = 0)
-	begin
-		print 'Disciplina: ' + @subject;
-
-		set @totalAlunos = (select count(*)
-							from ActiveData.Current_Course c
-							join ActiveData.Subject s
-							on s.SubjectID=c.SubjectID
-							where s.Name like @subject)
-
-		print 'Total de alunos inscritos: ' + cast(@totalAlunos as varchar(10));
-		print 'Taxa de crescimento: ' + cast(@taxaCrescimento as varchar(10));
-
-		print ' '	
-		set @totalAlunos = 0;
-		set @taxaCrescimento = 0;
-		fetch next from Subject_Cursor into @subject;
-	end
-
-	close Subject_Cursor;
-	deallocate Subject_Cursor;
-go
-
-exec dbo.spTotalAlunosInscritos
-
---Total de alunos por escola/ano letivo
-create or alter procedure dbo.spTotalAlunosEscola  @school nvarchar(30)
-as
-	select count(*)
-	from ActiveData.Student st
-	join ActiveData.School sc
-	on st.SchoolID=sc.SchoolID
-	where sc.Name like @school
-go
-
-exec dbo.spTotalAlunosEscola @school='GP'
-
---Consultar notas
-create or alter procedure dbo.spConsultarNotas @userMail nvarchar(30), @password nvarchar(30), @studentName nvarchar(30)
-as
-	declare @guardianID int;
-	declare @guardian int;
-	set @guardianID = (select GuardianID
-						from ActiveData.Guardian g
-						join ActiveData.Sys_User u
-						on g.UserID=u.UserID
-						where u.Mail like @userMail);
-
-	if @guardianID>0
-		set @guardian = (select s.StudentID
-						from ActiveData.Guardian g
-						join ActiveData.Student s
-						on g.GuardianID=s.GuardianID
-						join ActiveData.Sys_User u
-						on s.UserID=u.UserID
-						where g.GuardianID=@guardianID
-						and u.Name like @studentName);
-	else
-		set @guardian = (select s.StudentID
-						from ActiveData.Student s
-						join ActiveData.Sys_User u
-						on s.UserID=u.UserID
-						where u.Name like @studentName
-						and u.Mail like @userMail);
-
-	if @guardian>0
-	begin
-		select u.Name, c.SchoolYear, su.Name, c.P1_grade, c.P2_grade, c.P3_grade
-		from ArchiveData.Cloosed_Course c
-		join ActiveData.Student st
-		on c.StudentID=st.StudentID
-		join ActiveData.Subject su
-		on c.SubjectID=su.SubjectID
-		join ActiveData.Sys_User u
-		on st.UserID=u.UserID
-		where u.Name like @studentName;
-		select u.Name, su.Name, c.P1_grade, c.P2_grade, c.P3_grade
-		from ActiveData.Current_Course c
-		join ActiveData.Student st
-		on c.StudentID=st.StudentID
-		join ActiveData.Subject su
-		on c.SubjectID=su.SubjectID
-		join ActiveData.Sys_User u
-		on st.UserID=u.UserID
-		where u.Name like @studentName;
-	end
-go
-
-exec dbo.spConsultarNotas @userMail='filho@gmail.com', @password='123', @studentName='Filho'
-
-Create or alter procedure procedure recoverPasswordRequest (@mail nvarchar(70)) 
-as
-BEGIN
-	IF EXISTS (select * from ActiveData.Sys_User where Mail = @mail)
-	BEGIN
-		insert into servidorMail (mailReceiver, tokenNumber, mailDateTime) VALUES (@mail, 'something', CURRENT_TIMESTAMP)
-	END
-	ELSE
-	BEGIN
-		PRINT N'ENVIAR ERRO A DIZER QUE NAO EXISTE ESSE USER';
-	END
-END
-
-Create or alter procedure procedure changePassword (@mail nvarchar(70), @newPassword1 nvarchar(32), @newPassword2 nvarchar(32))
-as
-BEGIN
-declare @passwordHashed nvarchar (32)
-	IF (@newPassword1 = @newPassword2) 
-	BEGIN
-		set @passwordHashed = dbo.fnHashPassword (@newPassword1)
-		UPDATE ActiveData.Sys_User
-		SET Password =  @passwordHashed
-		where Mail = @mail
-	END
-END
-
-Create or alter procedure procedure tokenPasswordChange (@mail nvarchar(70), @tokenNumber nvarchar (10), @newPassword1 nvarchar(32), @newPassword2 nvarchar(32))
-as
-BEGIN
-declare @tempoParaReset smallint
-set @tempoParaReset = 60;
-declare @tempoToken datetime 
-	IF EXISTS (select * from ActiveData.Sys_User where Mail = @mail)
-	BEGIN
-		IF EXISTS (select * from servidorMail where mailReceiver = @mail AND tokenNumber = @tokenNumber)
-		BEGIN
-			set @tempoToken = (select mailDatetime from servidorMail where mailReceiver = @mail AND tokenNumber = @tokenNumber)
-			IF (DATEDIFF (MINUTE, @tempoToken, CURRENT_TIMESTAMP) <= @tempoParaReset )
-				BEGIN
-					exec changePassword(@mail, @newPassowrd1, @newPassword2)
-				END
-			ELSE
-				BEGIN
-					PRINT N'ENVIAR ERRO A DIZER QUE O TOKEN EXPIROU';
-				END
-		END
-		ELSE
-		BEGIN
-			PRINT N'ENVIAR ERRO A DIZER QUE NAO HA ESSE TOKEN PARA ESSE USER';
-		END
-	END
-	ELSE
-	BEGIN
-		PRINT N'ENVIAR ERRO A DIZER QUE NAO EXISTE ESSE USER';
-	END
-END
-
-Create or alter procedure procedure changeToNewPassword (@mail nvarchar(70),@oldPassword nvarchar(32) , @newPassword1 nvarchar(32), @newPassword2 nvarchar(32))
-as
-BEGIN
-	declare @hashedPW nvarchar (32)
-	set @hashedPW = dbo.fnHashPassword(@oldPassword)
-	IF EXISTS (select * from ActiveData.Sys_User where Mail = @mail AND Password = @hashedPW)
-	BEGIN
-		exec changePassword(@mail, @newPassowrd1, @newPassword2)
-	END
-	ELSE
-	BEGIN
-		PRINT N'ENVIAR ERRO A DIZER QUE COMBINACAO USER PASSWORD NAO EXISTE';
-	END
-END
-
-
-
 ---MIGRATION CODE
-
+/*
 --procedimento de importacao
-	exec migrateOldData
+--exec migrateOldData
 --drop procedure migrateOldData
-CREATE or alter procedure PROCEDURE migrateOldData -- CORRER DPS DA QUERY Q POPULA O SCHEMA OLD DATA COM A OLD DATA DATABASE
+
+
+
+CREATE PROCEDURE migrateOldData -- CORRER DPS DA QUERY Q POPULA O SCHEMA OLD DATA COM A OLD DATA DATABASE
 as
 BEGIN
 DECLARE @StudentID_curs nvarchar (20)
@@ -1079,10 +602,10 @@ END
 CLOSE Cur1;
 deallocate Cur1;
 END
+--*/
 
 
-
-
+--/*
 --TABLE VALUE USER DEFINED FUNCTIONS (substituir views +/-)
 --POR TESTAR 
 --so esta a returnar a ultima
@@ -1110,6 +633,7 @@ BEGIN
 END;
 
 
+--*/
 --select * from ArchiveData.Cloosed_Course where StudentID = 1
 --select * from fnGetStudentGrades (1)
 
@@ -1118,7 +642,7 @@ END;
 
 
 
---CALCULOS
+/*     CALCULOS
 CREATE TABLE #SpaceUsed (
 	 TableName sysname
 	,NumRows BIGINT
@@ -1145,3 +669,6 @@ ORDER BY ReservedSpace_MB desc
 select name, max_length
 from sys.columns
 where object_NAME(object_id) = 'Cloosed_Course'
+
+
+--*/

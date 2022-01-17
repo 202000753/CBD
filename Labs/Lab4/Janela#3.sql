@@ -11,20 +11,20 @@ SELECT -- use * to explore
 FROM sys.dm_tran_locks;
 
 --2)
-SELECT -- use * to explore
- session_id AS spid,
+SELECT *
+ /*session_id AS spid,
  blocking_session_id,
  command,
  sql_handle,
  database_id,
  wait_type,
  wait_time,
- wait_resource
+ wait_resource*/
 FROM sys.dm_exec_requests
-WHERE blocking_session_id > 0;
+--WHERE blocking_session_id > 0;
 
 --3)
 SELECT session_id, text
 FROM sys.dm_exec_connections
  CROSS APPLY sys.dm_exec_sql_text(most_recent_sql_handle) AS ST
-WHERE session_id IN (X, Y);
+WHERE session_id IN (51, 70);

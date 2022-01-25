@@ -1,4 +1,6 @@
---drop database ProjectoCBD
+/*Tiago Paixão	201000625
+Nuno Reis		202000753*/
+
 create database ProjectoCBD
 go
 use ProjectoCBD
@@ -118,7 +120,7 @@ create table ActiveData.Current_Course(
 	PRIMARY KEY(SubjectID, StudentID)
 )
 
-CREATE TABLE servidorMail(
+CREATE TABLE ActiveData.ServidorMail(
 	mailID int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	mailReceiver nvarchar (70) NOT NULL,
 	tokenNumber nvarchar (10) NOT NULL,
@@ -129,9 +131,9 @@ CREATE TABLE servidorMail(
 CREATE FUNCTION fnHashPassword (@password NVARCHAR(32))
 Returns NVARCHAR(32)
 AS
-	BEGIN
-		return HASHBYTES('SHA1', @password)
-	END
+BEGIN
+	return HASHBYTES('SHA1', @password)
+END
 
 CREATE or alter procedure PROCEDURE insertNewStudent (@mail nvarchar(70),
 									@name nvarchar (60),
@@ -193,24 +195,24 @@ select CURRENT_TIMESTAMP
 --select * from ActiveData.Address
 
 
-CREATE or alter procedure PROCEDURE insertNewSubject (@name nvarchar (60))
+CREATE or alter procedure insertNewSubject (@name nvarchar (60))
 as
 insert into ActiveData.Subject (Name) values (@name)
 go
 
-CREATE or alter procedure PROCEDURE insertRowCloosed_Course (@SchoolYear smallint,	@SubjectID int,	@StudentID int, @Failures tinyint, @Absences tinyint, @P1_grade tinyint, @P2_grade tinyint, @P3_grade tinyint)
+CREATE or alter procedure insertRowCloosed_Course (@SchoolYear smallint,	@SubjectID int,	@StudentID int, @Failures tinyint, @Absences tinyint, @P1_grade tinyint, @P2_grade tinyint, @P3_grade tinyint)
 as
 insert into ArchiveData.Cloosed_Course (SchoolYear, SubjectID, StudentID, Failures, Absences, P1_grade, P2_grade, P3_grade) values (@SchoolYear,	@SubjectID,	@StudentID, @Failures, @Absences, @P1_grade, @P2_grade, @P3_grade)
 go
 
-CREATE or alter procedure PROCEDURE registerStudentInSubject (@studentID int, @subjectID int, @failures tinyint) --REGISTA UM ALUNO EM UMA DISCIPLINA NO ANO ACTUAL
+CREATE or alter procedure registerStudentInSubject (@studentID int, @subjectID int, @failures tinyint) --REGISTA UM ALUNO EM UMA DISCIPLINA NO ANO ACTUAL
 as
 BEGIN
 	insert into ActiveData.Current_Course (SubjectID, StudentID, Failures , Absences, P1_grade, P2_grade, P3_grade) values (@subjectID, @studentID, @failures, 0, NULL,NULL,NULL)
 END
 go
 
-CREATE or alter procedure PROCEDURE startSchoolYear (@year smallint)
+CREATE or alter procedure startSchoolYear (@year smallint)
 as
 BEGIN
 	SELECT *
@@ -257,7 +259,7 @@ BEGIN
 END
 GO
 
-CREATE or alter procedure PROCEDURE endSchoolYear (@year smallint) --FECHA O ANO ESCOLAR, RECEBE O ANO
+CREATE or alter procedure endSchoolYear (@year smallint) --FECHA O ANO ESCOLAR, RECEBE O ANO
 as
 BEGIN
 	insert into ArchiveData.Cloosed_Course (SchoolYear, SubjectID, StudentID, Failures , Absences, P1_grade, P2_grade, P3_grade)
@@ -671,7 +673,7 @@ go
 
 exec dbo.spConsultarNotas @userMail='filho@gmail.com', @password='123', @studentName='Filho'
 
-Create or alter procedure procedure recoverPasswordRequest (@mail nvarchar(70)) 
+Create or alter procedure recoverPasswordRequest (@mail nvarchar(70)) 
 as
 BEGIN
 	IF EXISTS (select * from ActiveData.Sys_User where Mail = @mail)
@@ -684,7 +686,7 @@ BEGIN
 	END
 END
 
-Create or alter procedure procedure changePassword (@mail nvarchar(70), @newPassword1 nvarchar(32), @newPassword2 nvarchar(32))
+Create or alter procedure changePassword (@mail nvarchar(70), @newPassword1 nvarchar(32), @newPassword2 nvarchar(32))
 as
 BEGIN
 declare @passwordHashed nvarchar (32)
@@ -697,7 +699,7 @@ declare @passwordHashed nvarchar (32)
 	END
 END
 
-Create or alter procedure procedure tokenPasswordChange (@mail nvarchar(70), @tokenNumber nvarchar (10), @newPassword1 nvarchar(32), @newPassword2 nvarchar(32))
+Create or alter procedure tokenPasswordChange (@mail nvarchar(70), @tokenNumber nvarchar (10), @newPassword1 nvarchar(32), @newPassword2 nvarchar(32))
 as
 BEGIN
 declare @tempoParaReset smallint
@@ -728,7 +730,7 @@ declare @tempoToken datetime
 	END
 END
 
-Create or alter procedure procedure changeToNewPassword (@mail nvarchar(70),@oldPassword nvarchar(32) , @newPassword1 nvarchar(32), @newPassword2 nvarchar(32))
+Create or alter procedure changeToNewPassword (@mail nvarchar(70),@oldPassword nvarchar(32) , @newPassword1 nvarchar(32), @newPassword2 nvarchar(32))
 as
 BEGIN
 	declare @hashedPW nvarchar (32)
@@ -750,7 +752,7 @@ END
 --procedimento de importacao
 	exec migrateOldData
 --drop procedure migrateOldData
-CREATE or alter procedure PROCEDURE migrateOldData -- CORRER DPS DA QUERY Q POPULA O SCHEMA OLD DATA COM A OLD DATA DATABASE
+CREATE or alter procedure migrateOldData -- CORRER DPS DA QUERY Q POPULA O SCHEMA OLD DATA COM A OLD DATA DATABASE
 as
 BEGIN
 DECLARE @StudentID_curs nvarchar (20)

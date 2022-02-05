@@ -5,6 +5,34 @@ Nuno Reis		202000753*/
 use ProjectoCBD
 go
 
+create or alter procedure criarRoles
+as
+begin
+	CREATE ROLE developer;  
+	GO 
+
+	CREATE ROLE client;  
+	GO 
+
+	CREATE ROLE reader;  
+	GO 
+
+	grant control to developer;
+
+
+	grant select to developer;
+	grant insert to developer;
+	grant update to developer;
+	grant create table to developer;
+	grant delete to developer;
+
+	grant select to client;
+	grant insert to client;
+	grant update to client;
+
+	grant select to reader;
+exec criarRoles;
+
 create or alter procedure gerarDados
 as
 begin

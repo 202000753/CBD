@@ -111,12 +111,15 @@ db.Products.update({ ProductID: 776 },{ $push: { comment: {clientEmail: 'kim2@ad
 
 //Etapa 3
 //1.
+db.Products.find({comment: {$exists:true}}, {Name:1, Category:2, comment:3})
 
 //2.
+db.Products.find({Category: "Mountain Bikes"})
 
 //3.
 
 //4.
+db.Products.find({comment: {$exists:false}})
 
 //5.
 

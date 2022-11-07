@@ -131,24 +131,26 @@ CREATE OR ALTER PROCEDURE salesLT.sp_disable_FK @p_table_name nvarchar(20)
 AS
 BEGIN
 	DECLARE cur CURSOR  
-		FOR SELECT col.COLUMN_NAME
+		FOR SELECT col.CONSTRAINT_NAME
 			FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS Tab, INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE Col 
-			WHERE Col.Constraint_Name = Tab.Constraint_Name AND Col.Table_Name = Tab.Table_Name and Constraint_Type = 'FOREIGN KEY' and Col.Table_Name = 'Product';
+			WHERE Col.Constraint_Name = Tab.Constraint_Name AND Col.Table_Name = Tab.Table_Name and Constraint_Type = 'FOREIGN KEY' and Col.Table_Name = @p_table_name;
 
 	DECLARE 
-		@ColumnName varchar(50)
+		@Name varchar(50)
 
 	OPEN cur 
 	FETCH NEXT FROM cur INTO 
-		@ColumnName
+		@Name
 
 	WHILE @@FETCH_STATUS = 0 
 	BEGIN 
 		--Criar um print com o script que faz disable ás chaves estrangeiras
-		PRINT 'Column Name: ' + @ColumnName
+		PRINT 'ALTER TABLE ' + @p_table_name
+		PRINT 'NOCHECK CONSTRAINT ' + @Name + ';'
+		PRINT ''
 
 		FETCH NEXT FROM cur INTO 
-			@ColumnName
+			@Name
 	END 
 	CLOSE cur 
 	DEALLOCATE cur

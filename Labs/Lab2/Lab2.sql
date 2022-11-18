@@ -145,7 +145,7 @@ BEGIN
 	WHILE @@FETCH_STATUS = 0 
 	BEGIN 
 		--Criar um print com o script que faz disable ás chaves estrangeiras
-		PRINT 'ALTER TABLE ' + @p_table_name
+		PRINT 'ALTER TABLE SalesLT.' + @p_table_name
 		PRINT 'NOCHECK CONSTRAINT ' + @Name + ';'
 		PRINT ''
 
@@ -157,7 +157,6 @@ BEGIN
 END
 
 EXEC salesLT.sp_disable_FK 'Product';
-
 
 SELECT *
 from INFORMATION_SCHEMA.TABLE_CONSTRAINTS Tab, INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE Col 

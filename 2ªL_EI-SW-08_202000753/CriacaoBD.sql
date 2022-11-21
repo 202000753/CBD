@@ -13,25 +13,25 @@ CREATE DATABASE WWIGlobal
 /*ON 
 ( NAME = WWIGlobal_Saledat,
 	FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\WWIGlobalSaledat.mdf',
-	SIZE = --,
-	MAXSIZE = --,
-	FILEGROWTH = -- ),
+	SIZE = 8192KB,
+	--MAXSIZE = --,
+	FILEGROWTH = 65536KB ),
 ( NAME = WWIGlobal2_Productdat,
 	FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\WWIGlobalProductdat.mdf',
-	SIZE = --,
-	MAXSIZE = --,
-	FILEGROWTH = -- ),
+	SIZE = 8192KB,
+	--MAXSIZE = --,
+	FILEGROWTH = 65536KB ),
 ( NAME = WWIGlobal2_Userdat,
 	FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\WWIGlobalUserdat.mdf',
-	SIZE = --,
-	MAXSIZE = --,
-	FILEGROWTH = -- )
+	SIZE = 8192KB,
+	--MAXSIZE = --,
+	FILEGROWTH = 65536KB )
 LOG ON
 ( NAME = WWIGlobal_log,
 	FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\WWIGloballog.ldf',
-	SIZE = --,
-	MAXSIZE = --,
-	FILEGROWTH = -- ) ;*/
+	SIZE = 8192KB,
+	--MAXSIZE = --,
+	FILEGROWTH = 65536KB ) ;*/
 GO
 
 USE WWIGlobal
@@ -236,7 +236,8 @@ CREATE TABLE UsersInfo.Token (
 	TokId INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
     TokUserId INT NOT NULL FOREIGN KEY REFERENCES UsersInfo.SysUser(SysUseId),
     TokMail VARCHAR(30) NOT NULL,
-	TokDate TIMESTAMP NOT NULL,
+	TokDateTime DATETIME NOT NULL,
+	TokEndDateTime DATETIME NOT NULL,
 	TokToken INT UNIQUE NOT NULL
 );
 GO
@@ -246,6 +247,6 @@ CREATE TABLE UsersInfo.ErrorLog (
 	ErrLogId INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
     ErrLogUserId INT NOT NULL FOREIGN KEY REFERENCES UsersInfo.SysUser(SysUseId),
     ErrLogError VARCHAR(100) NOT NULL,
-	ErrLogDate Date NOT NULL
+	ErrLogDate DATETIME NOT NULL
 );
 GO

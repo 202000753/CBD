@@ -133,7 +133,7 @@ END;
 GO
 
 --Função que retorna id se existir um user e 0 se não existir
-CREATE OR ALTER FUNCTION UsersInfo.userExists (@name varchar(50))
+CREATE OR ALTER FUNCTION UsersInfo.userExistsByName (@name varchar(50))
 RETURNS int
 BEGIN
 	declare @result int
@@ -148,7 +148,7 @@ BEGIN
 	
 	return @result
 END;
---select UsersInfo.userExists('Tailspin Toys (Peeples Valley, AZ)');
+--select UsersInfo.userExistsByName('Tailspin Toys (Peeples Valley, AZ)');
 GO
 
 --Função que retorna id se existir uma região associada a uma categoria e 0 se não existir
@@ -332,7 +332,7 @@ END;
 --select ProductsInfo.promotionExists(1);
 GO
 
---Função que retorna id se existir um product associado a uma pormução e 0 se não existir
+--Função que retorna id se existir um product associado a uma pormoção e 0 se não existir
 CREATE OR ALTER FUNCTION ProductsInfo.productPromotionExists (@name varchar(100), @id int)
 RETURNS int
 BEGIN
@@ -534,6 +534,8 @@ GO
 CREATE OR ALTER PROCEDURE Migrate_OldData_CustomerTable
 AS
 BEGIN
+	insert into UsersInfo.SysUser (SysUseEmail, SysUsePassword, SysUseName) values(' ', ' ', 'Sys')
+		
 	DECLARE customerCursor CURSOR  
 		FOR SELECT Customer, [Bill To Customer], Category, [Buying Group], [Primary Contact], [Postal Code]
 		FROM OldData.Customer;
@@ -600,7 +602,7 @@ BEGIN
 			insert into UsersInfo.BuyingGroup (BuyGrouName) values(@BuyingGroup)
 		END
 
-		IF UsersInfo.userExists (@Customer) = 0
+		IF UsersInfo.userExistsByName (@Customer) = 0
 		BEGIN
 			DECLARE splitCursor CURSOR  
 				FOR SELECT * from string_split(@Customer, '(');
@@ -723,16 +725,16 @@ BEGIN
 		END
 		
 		--Customer
-		set @UserID = UsersInfo.userExists(@Customer)
+		set @UserID = UsersInfo.userExistsByName(@Customer)
 		IF UsersInfo.CustomerExists (@UserID) = 0
 		BEGIN
 			IF @Customer not like '%Head Office%'
 			BEGIN		
 				set @BuyingGroupID = UsersInfo.buyingGroupExists(@BuyingGroup)
 				set @RegionCategoryID = UsersInfo.Region_CategoryExists(@State, REPLACE(@City,'_',' '), @Category)
-				set @HeadquartersID = UsersInfo.userExists(@BillToCustomer)
+				set @HeadquartersID = UsersInfo.userExistsByName(@BillToCustomer)
 				
-				insert into UsersInfo.Customer (CusUserId, CusHeadquartersId, CusRegion_CategoryId, CusBuyingGroupId, CusPrimaryContact) values(@UserID, @UserID, @RegionCategoryID, @BuyingGroupID, @PrimaryContact)
+				insert into UsersInfo.Customer (CusUserId, CusHeadquartersId, CusRegion_CategoryId, CusBuyingGroupId, CusPrimaryContact) values(@UserID, @HeadquartersID, @RegionCategoryID, @BuyingGroupID, @PrimaryContact)
 			END
 			ELSE
 			BEGIN
@@ -786,12 +788,12 @@ BEGIN
 		set @Mail = REPLACE(@Employee,' ','_')+ '@employees.com'
 
 		--User
-		IF UsersInfo.userExists (@Employee) = 0
+		IF UsersInfo.userExistsByName (@Employee) = 0
 		BEGIN
 			insert into UsersInfo.SysUser (SysUseEmail, SysUsePassword, SysUseName) values(@Mail, @Pass, @Employee)
 		END
 
-		set @UserID = UsersInfo.userExists(@Employee)
+		set @UserID = UsersInfo.userExistsByName(@Employee)
 
 		--Employee
 		IF UsersInfo.EmployeeExists (@UserID) = 0
@@ -952,11 +954,11 @@ BEGIN
 		IF ProductsInfo.promotionExists (1) = 0
 		BEGIN
 			SET IDENTITY_INSERT ProductsInfo.Promotion ON
-			insert into ProductsInfo.Promotion(PromId, PromDescription, PromStartDate, PromEndDate) values(1, 'No Promotion', GETDATE(), GETDATE())
+			insert into ProductsInfo.Promotion(PromId, PromDescription, PromStartDate, PromEndDate) values(1, 'No Promotion', GETDATE(), CAST('2032-08-25' AS date))
 			SET IDENTITY_INSERT ProductsInfo.Promotion OFF
 		END
 
-		--Promotion
+		--Product Promotion
 		IF ProductsInfo.productPromotionExists (@StockItem, 1) = 0
 		BEGIN
 			declare @productID int
@@ -1015,6 +1017,7 @@ BEGIN
 	DECLARE
 		@customer varchar(100),
 		@employee varchar(100),
+		@newDescription varchar(100),
 		@customerID int,
 		@employeeID int,
 		@productPromotionID int,
@@ -1045,8 +1048,10 @@ BEGIN
 		set @customer = (select Customer from OldData.Customer where [Customer Key] = @CustomerKey)
 		set @employee  = (select Employee from OldData.Employee where [Employee Key] = @SalespersonKey)
 		
-		set @customerID = UsersInfo.userExists(@customer)
-		set @employeeID = UsersInfo.userExists(@employee)
+		set @customerID = UsersInfo.userExistsByName(@customer)
+		set @employeeID = UsersInfo.userExistsByName(@employee)
+		
+		set @newDescription = 'Sale' + cast(@WWIInvoiceID as varchar(10))
 
 		--Sale
 		IF SalesInfo.vendaExists (@WWIInvoiceID) = 0
@@ -1069,7 +1074,7 @@ BEGIN
 			@employeeID,
 			@InvoiceDateKey,
 			@DeliveryDateKey,
-			@Description,
+			@newDescription,
 			@Profit,
 			@TaxAmount,
 			@TotalExcludingTax,
@@ -1085,6 +1090,10 @@ BEGIN
 		BEGIN
 			insert into SalesInfo.productPromotion_Sale (ProdProm_SalProductPromotionId, ProdProm_SalSaleId, ProdProm_SalQuantity) values(@productPromotionID, @saleID, @Quantity)
 		END
+
+		update SalesInfo.Sale
+		set SalIsFinished = 1
+		where SalID = @WWIInvoiceID
 
 		FETCH NEXT FROM saleCursor INTO
 		@WWIInvoiceID,
@@ -1120,7 +1129,3 @@ BEGIN
 END;
 GO
 Exec MigrateAll;
-
-
-
-

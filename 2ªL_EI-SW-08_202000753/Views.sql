@@ -6,20 +6,24 @@
 *		Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
 *
 ********************************************/
-create view UsersInfo.viewNorthAmericaCountry as
+create or alter view UsersInfo.viewNorthAmericaCountry as
 select *
 from UsersInfo.Country
 where CouContinent = 'North America';
+go
 select *
 from UsersInfo.viewNorthAmericaCountry;
+go
 
-create view UsersInfo.viewCitySalesTerritory as
+create or alter view UsersInfo.viewCitySalesTerritory as
 select distinct CitSalesTerritory
 from UsersInfo.City;
+go
 select *
-from UsersInfo.citySalesTerritory;
+from UsersInfo.viewCitySalesTerritory;
+go
 
-create view UsersInfo.viewRegion_Category as
+create or alter view UsersInfo.viewRegion_Category as
 select rc.Reg_CatId, co.CouName, co.CouContinent, s.StaProName, s.StaProCode, ci.CitName, ci.CitSalesTerritory, ci.CitLasPopulationRecord, ca.CatName, rc.Reg_CatPostalCode
 from UsersInfo.Region_Category rc
 join UsersInfo.StateProvince s
@@ -30,10 +34,12 @@ join UsersInfo.Category ca
 on rc.Reg_CatCategoryId = ca.CatId
 join UsersInfo.Country co
 on rc.Reg_CatCountryId = co.CouId;
+go
 select *
 from UsersInfo.viewRegion_Category;
+go
 
-create view UsersInfo.viewCustomer as
+create or alter view UsersInfo.viewCustomer as
 select s.SysUseName, s.SysUseEmail, c.CusPrimaryContact, sy.SysUseName as 'Headquarters', ca.CatName, rc.Reg_CatPostalCode
 from UsersInfo.Customer c
 join UsersInfo.SysUser s
@@ -46,21 +52,22 @@ join UsersInfo.Region_Category rc
 on c.CusRegion_CategoryId = rc.Reg_CatId
 join UsersInfo.Category ca
 on rc.Reg_CatCategoryId = ca.CatId;
+go
 select *
 from UsersInfo.viewCustomer;
+go
 
-create view UsersInfo.viewEmployee as
+create or alter view UsersInfo.viewEmployee as
 select s.SysUseName, s.SysUseEmail, e.EmpPreferedName, CAST(CASE WHEN e.EmpIsSalesPerson = 1 THEN 'Yes' ELSE 'No' END AS varchar(20)) as 'Is Sales Person'
 from UsersInfo.Employee e
 join UsersInfo.SysUser s
 on e.EmpUserId = s.SysUseId;
+go
 select *
 from UsersInfo.viewEmployee;
+go
 
-select *
-from ProductsInfo.Product;
-
-create view ProductsInfo.viewProduct as
+create or alter view ProductsInfo.viewProduct as
 select p.ProdName, b.BraName, t.TaxRatTaxRate, pt.ProTypName, ps.PacPackage as 'Selling Package', pb.PacPackage as 'Buying Package', p.ProdSize, p.ProdLeadTimeDays, p.ProdQuantityPerOuter, p.ProdUnitPrice, p.ProdRecommendedRetailPrice, p.ProdTypicalWeightPerUnit
 from ProductsInfo.Product p
 join ProductsInfo.Brand b
@@ -73,20 +80,24 @@ join ProductsInfo.Package ps
 on p.ProdSellingPackageId = ps.PacId
 join ProductsInfo.Package pb
 on p.ProdBuyingPackageId = pb.PacId;
+go
 select *
 from ProductsInfo.viewProduct;
+go
 
-create view ProductsInfo.viewProductPromotion as
+create or alter view ProductsInfo.viewProductPromotion as
 select p.ProdName, p.ProdUnitPrice, p.ProdRecommendedRetailPrice, pp.ProdNewPrice, pr.PromDescription, pr.PromStartDate as 'Start Date', pr.PromEndDate as 'End Date'
 from ProductsInfo.Product p
 join ProductsInfo.Product_Promotion pp
 on p.ProdId = pp.Prod_PromProductId
 join ProductsInfo.Promotion pr
 on pp.Prod_PromPromotionId = pr.PromId;
+go
 select *
 from ProductsInfo.viewProductPromotion;
+go
 
-create view SalesInfo.viewProductPromotionSale as
+create or alter view SalesInfo.viewProductPromotionSale as
 select s.SalID, s.SalDate, s.SalDeliveryDate, s.SalTotalPrice, s.SalTotalExcludingTax, sc.SysUseName as 'Customer', se.SysUseName as 'Employee', p.ProdName, prs.ProdProm_SalQuantity, p.ProdUnitPrice, pr.PromDescription, pr.PromStartDate as 'Start Date', pr.PromEndDate as 'End Date'
 from ProductsInfo.Product p
 join ProductsInfo.Product_Promotion pp
@@ -101,5 +112,7 @@ join UsersInfo.SysUser sc
 on s.SalCustomerId = sc.SysUseId
 join UsersInfo.SysUser se
 on s.SalEmployeeId = se.SysUseId;
+go
 select *
 from SalesInfo.viewProductPromotionSale;
+go

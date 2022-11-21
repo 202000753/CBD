@@ -62,6 +62,12 @@ select *
 from UsersInfo.SysUser;
 
 select *
+from UsersInfo.ErrorLog;
+
+select *
+from UsersInfo.Token;
+
+select *
 from UsersInfo.Region_Category;
 
 select *
@@ -95,7 +101,8 @@ select *
 from SalesInfo.Sale;
 
 select *
-from SalesInfo.ProductPromotion_Sale;
+from SalesInfo.ProductPromotion_Sale
+order by ProdProm_SalSaleId;
 
 /********************************************
  *	Queries de verificação de conformidade

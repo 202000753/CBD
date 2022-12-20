@@ -1,46 +1,110 @@
- /********************************************
- *	UC: Complementos de Bases de Dados 2022/2023
- *
- *	Projeto - Queries das tabelas da base de dados antiga
- *		Nuno Reis (202000753)
- *		Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
- *
- ********************************************/
- USE WWI_DS
+/********************************************
+*	UC: Complementos de Bases de Dados 2022/2023
+*
+*	Projeto - Queries das tabelas da base de dados antiga
+*		Nuno Reis (202000753)
+*		Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
+*
+********************************************/
+USE WWI_DS
  
- --City
+--City
+select distinct Country
+from dbo.City
+order by Country;
+
+select distinct Continent
+from dbo.City
+order by Continent;
+
+select distinct City
+from dbo.City
+order by City;
+
+select distinct [State Province]
+from dbo.City
+order by [State Province];
+
+--States
 select *
-from dbo.City;
+from dbo.States
+order by name;
+
+--lookup
+select *
+from dbo.lookup
+order by name;
+
 
 --Customer
+select distinct Category
+from dbo.Customer
+order by Category;
+
+select distinct [Buying Group]
+from dbo.Customer
+order by [Buying Group];
+
+select distinct Customer
+from dbo.Customer
+order by Customer;
+
 select *
 from dbo.Customer;
 
 --Employee
+select distinct [Preferred Name]
+from dbo.Employee
+order by [Preferred Name];
+
+select distinct Employee
+from dbo.Employee
+order by Employee;
+
 select *
 from dbo.Employee;
 
 --Sale
+select distinct Package
+from dbo.Sale
+order by Package;
+
+select distinct [WWI Invoice ID]
+from dbo.Sale
+order by [WWI Invoice ID];
+
 select *
 from dbo.Sale
 order by [WWI Invoice ID];
 
 --Stock Item
+select distinct [Selling Package]
+from dbo.[Stock Item]
+order by [Selling Package];
+
+select distinct [Buying Package]
+from dbo.[Stock Item]
+order by [Buying Package];
+
+select distinct Brand
+from dbo.[Stock Item]
+order by Brand;
+
+select distinct [Is Chiller Stock]
+from dbo.[Stock Item]
+order by [Is Chiller Stock];
+
+select distinct [Tax Rate]
+from dbo.[Stock Item]
+order by [Tax Rate];
+
 select *
-from dbo.[Stock Item];
+from dbo.[Stock Item]
+order by [Stock Item];
 
---States
-select *
-from dbo.States;
-
---lookup
-select *
-from dbo.lookup;
-
-
- /********************************************
- *	Queries de verificação de conformidade
- ********************************************/
+/********************************************
+*	Queries de verificação de conformidade
+********************************************/
 -- Nº de “Customers”
 select count(*) as 'Nº de Customers'
 from dbo.Customer;
@@ -83,9 +147,23 @@ order by so.[Stock Item], year(sa.[Delivery Date Key]);
 -- Total monetário de vendas por ano por “City”
 -- Valor monetário obtido por quantity*Unit Price
 -- O ano deve ser retirado da coluna “Delivery Date Key”
-select c.City as 'Cidade', year(s.[Delivery Date Key]) as 'Ano', sum(s.Quantity * s.[Unit Price]) as 'Total monetario'
+select ci.City as 'Cidade', year(s.[Delivery Date Key]) as 'Ano', sum(s.Quantity * s.[Unit Price]) as 'Total monetario'
 from dbo.Sale s
-join dbo.City c
-on s.[City Key] = c.[City Key]
-group by c.City, year(s.[Delivery Date Key])
-order by c.City, year(s.[Delivery Date Key]);
+join dbo.Customer cu
+on s.[Customer Key] = cu.[Customer Key]
+join dbo.City ci
+on cu.Customer like '%' + ci.City + '%'
+group by ci.City, year(s.[Delivery Date Key])
+order by ci.City, year(s.[Delivery Date Key]);
+
+select ci.City
+from dbo.Sale s
+join dbo.Customer cu
+on s.[Customer Key] = cu.[Customer Key]
+join dbo.City ci
+on cu.Customer like '%' + ci.City + '%'
+where ci.City like 'Abbottsburg'
+
+select year(s.[Delivery Date Key]) as 'Ano', sum(s.Quantity * s.[Unit Price]) as 'Total monetario'
+from dbo.Sale s
+group by year(s.[Delivery Date Key])

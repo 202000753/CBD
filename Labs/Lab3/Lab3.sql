@@ -47,15 +47,15 @@ begin
 
 	WHILE @@FETCH_STATUS = 0  
 	BEGIN
-		exec('SELECT 1.00 / (CAST(COUNT(DISTINCT ' + @nomeColuna + ') AS DECIMAL(10,4))/ COUNT(' + @nomeColuna + ')) as n
+		exec('SELECT (CAST(COUNT(DISTINCT ' + @nomeColuna + ') AS DECIMAL(10,4))/ COUNT(' + @nomeColuna + ')) as ' + @nomeColuna + '
 					FROM SalesLT.Customer')
 
-		set @sql = 'SELECT 1.00 / (CAST(COUNT(DISTINCT ' + @nomeColuna + ') AS DECIMAL(10,4))/ COUNT(' + @nomeColuna + ')) as n
+		/*set @sql = 'SELECT 1.00 / (CAST(COUNT(DISTINCT ' + @nomeColuna + ') AS DECIMAL(10,4))/ COUNT(' + @nomeColuna + ')) as n
 					FROM SalesLT.Customer';
 
 		exec sp_executesql @sql, @seletividadeColuna
 
-		print 'Coluna: ' + @nomeColuna + ' ' + CAST(@seletividadeColuna AS VARCHAR)
+		print 'Coluna: ' + @nomeColuna + ' ' + CAST(@seletividadeColuna AS VARCHAR)*/
 
 		FETCH NEXT FROM cursorColunas INTO @nomeColuna 
 	END 
@@ -68,19 +68,19 @@ exec seletividades;
 
 /*4. Quais as colunas candidatas à criação de índices tendo em conta os resultados obtidos na 
 alínea anterior? Justifique a resposta.*/
-
+--CustomerID e rowguid, possivelmente tambem MiddleName, CompanyName, EmailAddress, Phone, PasswordHash e PasswordSalt
 
 --============================================================================= 
 -- Etapa 2
 --============================================================================= 
 --1. Visualize as estatísticas e correspondente Execution Plan das seguintes instruções:
-/*SET STATISTICS IO ON
+SET STATISTICS IO ON
+SELECT c.LastName , c.FirstName
+FROM SalesLT.Customer c
+WHERE CustomerID=100;
 SELECT c.LastName , c.FirstName 
 FROM SalesLT.Customer c
-WHERE CustomerID=100
-SELECT c.LastName , c.FirstName 
-FROM SalesLT.Customer c
-WHERE c.phone ='979-555-0163'*/
+WHERE c.phone ='979-555-0163';
 --Analise e comente qual a diferença no que diz respeito à utilização dos índices?
 
 

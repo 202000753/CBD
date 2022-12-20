@@ -1,24 +1,24 @@
 /********************************************
- *	UC: Complementos de Bases de Dados 2022/2023
- *
- *	Projeto 1ª Fase - Criar as functions
- *		Nuno Reis (202000753)
- *			Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
- *
- ********************************************/
- /********************************************
- * Stored Procedures
- ********************************************/
+*	UC: Complementos de Bases de Dados 2022/2023
+*
+*	Projeto 1ª Fase - Criar as functions
+*		Nuno Reis (202000753)
+*			Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
+*
+********************************************/
+/********************************************
+* Stored Procedures
+********************************************/
 --Editar Utilizadores
-CREATE OR ALTER PROCEDURE UsersInfo.editSysUser @userEmail VARCHAR(50), @newUserName VARCHAR(50), @newUserEmail VARCHAR(50), @newUserPassword VARCHAR(20)
+CREATE OR ALTER PROCEDURE UsersInfo.sp_editSysUser @userEmail VARCHAR(50), @newUserName VARCHAR(50), @newUserEmail VARCHAR(50), @newUserPassword VARCHAR(20)
 AS
 	declare
 		@error varchar(100),
 		@userID int,
 		@user2ID int
 
-	set @userID = UsersInfo.userExistsByEmail(@userEmail)
-	set @user2ID = UsersInfo.userExistsByEmail(@newUserEmail)
+	set @userID = UsersInfo.udf_userExistsByEmail(@userEmail)
+	set @user2ID = UsersInfo.udf_userExistsByEmail(@newUserEmail)
 
 	if @userID != 0 and @user2ID = 0
 	begin
@@ -33,21 +33,21 @@ AS
 		insert into UsersInfo.ErrorLog values(@userID, @error, GETDATE())
 	end
 GO
---EXEC UsersInfo.editSysUser N'Eva_Muirden@employees.com', N'Nuno Reis', N'nunoreis294@gmail.com', N'Pass321';
+--EXEC UsersInfo.sp_editSysUser N'Eva_Muirden@employees.com', N'Nuno Reis', N'nunoreis294@gmail.com', N'Pass321';
 GO
 
 --Adicionar Utilizadores
-CREATE OR ALTER PROCEDURE UsersInfo.createSysUser @userName VARCHAR(50), @userEmail VARCHAR(50), @userPassword VARCHAR(20)
+CREATE OR ALTER PROCEDURE UsersInfo.sp_createSysUser @userName VARCHAR(50), @userEmail VARCHAR(50), @userPassword VARCHAR(20)
 AS
 	declare
 		@userID int,
 		@error varchar(100)
 
-	set @userID = UsersInfo.userExistsByEmail(@userEmail)
+	set @userID = UsersInfo.udf_userExistsByEmail(@userEmail)
 	
 	if @userID = 0
 	begin
-		insert into UsersInfo.SysUser (SysUseEmail, SysUsePassword, SysUseName) values(@userEmail, UsersInfo.fnHashPassword(@userPassword), @userName)
+		insert into UsersInfo.udf_SysUser (SysUseEmail, SysUsePassword, SysUseName) values(@userEmail, UsersInfo.fnHashPassword(@userPassword), @userName)
 	end
 	else
 	begin
@@ -56,11 +56,11 @@ AS
 		insert into UsersInfo.ErrorLog values(@userID, @error, GETDATE())
 	end
 GO
---EXEC UsersInfo.createSysUser N'João Sousa', N'joao@gmail.com', N'Pass321';
+--EXEC UsersInfo.sp_createSysUser N'João Sousa', N'joao@gmail.com', N'Pass321';
 GO
 
 --Remover Utilizadores
-CREATE OR ALTER PROCEDURE UsersInfo.deleteSysUser @userEmail VARCHAR(50)
+CREATE OR ALTER PROCEDURE UsersInfo.sp_deleteSysUser @userEmail VARCHAR(50)
 AS
 	declare
 		@error varchar(100),
@@ -68,9 +68,9 @@ AS
 		@employeeID int,
 		@userID int
 
-	set @userID = UsersInfo.userExistsByEmail(@userEmail)
-	set @customerID = UsersInfo.CustomerExists(@userID)
-	set @employeeID = UsersInfo.EmployeeExists(@userID)
+	set @userID = UsersInfo.udf_userExistsByEmail(@userEmail)
+	set @customerID = UsersInfo.udf_CustomerExists(@userID)
+	set @employeeID = UsersInfo.udf_EmployeeExists(@userID)
 
 	if @userID != 0 and @customerID = 0 and @employeeID = 0
 	begin
@@ -84,19 +84,19 @@ AS
 		insert into UsersInfo.ErrorLog values(@userID, @error, GETDATE())
 	end
 GO
---EXEC UsersInfo.deleteSysUser N'joao@gmail.com';
+--EXEC UsersInfo.sp_deleteSysUser N'joao@gmail.com';
 GO
 
 --Recuperar Password
 --Criar Token
-CREATE OR ALTER PROCEDURE UsersInfo.createToken @userEmail VARCHAR(50)
+CREATE OR ALTER PROCEDURE UsersInfo.sp_createToken @userEmail VARCHAR(50)
 AS
 	declare
 		@token int,
 		@error varchar(100),
 		@userID int
 
-	set @userID = UsersInfo.userExistsByEmail(@userEmail)
+	set @userID = UsersInfo.udf_userExistsByEmail(@userEmail)
 
 	if @userID != 0
 	begin
@@ -111,26 +111,26 @@ AS
 		insert into UsersInfo.ErrorLog values(1, @error, GETDATE())
 	end
 GO
---EXEC UsersInfo.createToken N'nunoreis294@gmail.com';
+--EXEC UsersInfo.sp_createToken N'nunoreis294@gmail.com';
 GO
 
-CREATE OR ALTER PROCEDURE UsersInfo.recuperarPassword @userEmail VARCHAR(50), @token int, @newUserPassword VARCHAR(20)
+CREATE OR ALTER PROCEDURE UsersInfo.sp_recuperarPassword @userEmail VARCHAR(50), @token int, @newUserPassword VARCHAR(20)
 AS
 	declare
 		@tokenID int,
 		@error varchar(100),
 		@userID int
 
-	set @userID = UsersInfo.userExistsByEmail(@userEmail)
+	set @userID = UsersInfo.udf_userExistsByEmail(@userEmail)
 
 	if @userID != 0
 	begin
-		set @tokenID = UsersInfo.tokenExists(@userID, @token)
+		set @tokenID = UsersInfo.udf_tokenExists(@userID, @token)
 
 		if @tokenID != 0
 		begin
 			update UsersInfo.SysUser
-			set SysUsePassword = UsersInfo.fnHashPassword(@newUserPassword)
+			set SysUsePassword = UsersInfo.udf_fnHashPassword(@newUserPassword)
 			where SysUseId = @userID
 		end
 		else
@@ -147,11 +147,11 @@ AS
 		insert into UsersInfo.ErrorLog values(1, @error, GETDATE())
 	end
 GO
---EXEC UsersInfo.recuperarPassword N'nunoreis294@gmail.com', 357487, 'Pass333';
+--EXEC UsersInfo.sp_recuperarPassword N'nunoreis294@gmail.com', 357487, 'Pass333';
 GO
 
 --Alterar a data de inicio de uma promoção
-CREATE OR ALTER PROCEDURE ProductsInfo.cangePromotionDatesStart @product VARCHAR(100), @promotion VARCHAR(100), @startDate date
+CREATE OR ALTER PROCEDURE ProductsInfo.sp_cangePromotionDatesStart @product VARCHAR(100), @promotion VARCHAR(100), @startDate date
 AS
 	declare
 		@productPromotionID int,
@@ -159,9 +159,9 @@ AS
 		@error varchar(100),
 		@promotionID int
 
-	set @productID = ProductsInfo.productExists (@product)
-	set @promotionID = ProductsInfo.productPromotionExistsByName(@product, @promotion)
-	set @productPromotionID = ProductsInfo.productPromotionExists(@product, @promotionID)
+	set @productID = ProductsInfo.udf_productExists (@product)
+	set @promotionID = ProductsInfo.udf_productPromotionExistsByName(@product, @promotion)
+	set @productPromotionID = ProductsInfo.udf_productPromotionExists(@product, @promotionID)
 
 	if @productID != 0 and @promotionID != 0 and @productPromotionID != 0
 	begin
@@ -176,11 +176,11 @@ AS
 		insert into UsersInfo.ErrorLog values(1, @error, GETDATE())
 	end
 GO
---EXEC UsersInfo.cangePromotionDatesStart 'Void fill 400 L bag (White) 400L', 'No Promotion', '2022-08-26';
+--EXEC UsersInfo.sp_cangePromotionDatesStart 'Void fill 400 L bag (White) 400L', 'No Promotion', '2022-08-26';
 GO
 
 --Alterar a data de fim de uma promoção
-CREATE OR ALTER PROCEDURE ProductsInfo.cangePromotionDatesEnd @product VARCHAR(100), @promotion VARCHAR(100), @endDate date
+CREATE OR ALTER PROCEDURE ProductsInfo.sp_cangePromotionDatesEnd @product VARCHAR(100), @promotion VARCHAR(100), @endDate date
 AS
 	declare
 		@productPromotionID int,
@@ -188,9 +188,9 @@ AS
 		@error varchar(100),
 		@promotionID int
 
-	set @productID = ProductsInfo.productExists (@product)
-	set @promotionID = ProductsInfo.productPromotionExistsByName(@product, @promotion)
-	set @productPromotionID = ProductsInfo.productPromotionExists(@product, @promotionID)
+	set @productID = ProductsInfo.udf_productExists (@product)
+	set @promotionID = ProductsInfo.udf_productPromotionExistsByName(@product, @promotion)
+	set @productPromotionID = ProductsInfo.udf_productPromotionExists(@product, @promotionID)
 
 	if @productID != 0 and @promotionID != 0 and @productPromotionID != 0
 	begin
@@ -205,11 +205,11 @@ AS
 		insert into UsersInfo.ErrorLog values(1, @error, GETDATE())
 	end
 GO
---EXEC UsersInfo.cangePromotionDatesEnd 'Void fill 400 L bag (White) 400L', 'No Promotion', '2032-08-27';
+--EXEC UsersInfo.sp_cangePromotionDatesEnd 'Void fill 400 L bag (White) 400L', 'No Promotion', '2032-08-27';
 GO
 
 --Alterar as datas de inicio e fim de uma promoção
-CREATE OR ALTER PROCEDURE ProductsInfo.cangePromotionDates @product VARCHAR(100), @promotion VARCHAR(100), @startDate date, @endDate date
+CREATE OR ALTER PROCEDURE ProductsInfo.sp_cangePromotionDates @product VARCHAR(100), @promotion VARCHAR(100), @startDate date, @endDate date
 AS
 	declare
 		@productPromotionID int,
@@ -217,9 +217,9 @@ AS
 		@error varchar(100),
 		@promotionID int
 
-	set @productID = ProductsInfo.productExists (@product)
-	set @promotionID = ProductsInfo.productPromotionExistsByName(@product, @promotion)
-	set @productPromotionID = ProductsInfo.productPromotionExists(@product, @promotionID)
+	set @productID = ProductsInfo.udf_productExists (@product)
+	set @promotionID = ProductsInfo.udf_productPromotionExistsByName(@product, @promotion)
+	set @productPromotionID = ProductsInfo.udf_productPromotionExists(@product, @promotionID)
 
 	if @productID != 0 and @promotionID != 0 and @productPromotionID != 0
 	begin
@@ -234,11 +234,11 @@ AS
 		insert into UsersInfo.ErrorLog values(1, @error, GETDATE())
 	end
 GO
---EXEC UsersInfo.cangePromotionDates 'Void fill 400 L bag (White) 400L', 'No Promotion', '2022-08-25', '2032-08-25';
+--EXEC UsersInfo.sp_cangePromotionDates 'Void fill 400 L bag (White) 400L', 'No Promotion', '2022-08-25', '2032-08-25';
 GO
 
 --Criar uma venda
-CREATE OR ALTER PROCEDURE SalesInfo.createSale @customer VARCHAR(100), @employee VARCHAR(100), @description VARCHAR(100)
+CREATE OR ALTER PROCEDURE SalesInfo.sp_createSale @customer VARCHAR(100), @employee VARCHAR(100), @description VARCHAR(100)
 AS
 	declare
 		@saleID int,
@@ -246,9 +246,9 @@ AS
 		@employeeID int,
 		@error varchar(100)
 
-	set @saleID = SalesInfo.saleExistsByDescription(@description)
-	set @customerID = UsersInfo.CustomerExists(UsersInfo.userExists(@customer))
-	set @employeeID = UsersInfo.EmployeeExists(UsersInfo.userExists(@employee))
+	set @saleID = SalesInfo.udf_saleExistsByDescription(@description)
+	set @customerID = UsersInfo.udf_CustomerExists(UsersInfo.userExistsByName(@customer))
+	set @employeeID = UsersInfo.udf_EmployeeExists(UsersInfo.userExistsByName(@employee))
 
 	if @customerID != 0 and @EmployeeID != 0 and @saleID = 0
 	begin
@@ -261,11 +261,11 @@ AS
 		insert into UsersInfo.ErrorLog values(1, @error, GETDATE())
 	end
 GO
---EXEC SalesInfo.createSale 'Tailspin Toys (Sylvanite, MT)', 'Eva Muirden', 'Nova Venda2';
+--EXEC SalesInfo.sp_createSale 'Tailspin Toys (Sylvanite, MT)', 'Eva Muirden', 'Nova Venda1';
 GO
 
 --Adicionar um produto a uma venda
-CREATE OR ALTER PROCEDURE SalesInfo.addProductToSale @product VARCHAR(100), @promotion VARCHAR(100), @description VARCHAR(100), @quantity int
+CREATE OR ALTER PROCEDURE SalesInfo.sp_addProductToSale @product VARCHAR(100), @promotion VARCHAR(100), @description VARCHAR(100), @quantity int
 AS
 	declare
 		@saleID int,
@@ -278,12 +278,12 @@ AS
 		@saleIsFinished bit,
 		@error varchar(100)
 
-	set @saleID = SalesInfo.saleExistsByDescription(@description)
-	set @productID = ProductsInfo.productExists(@product)
-	set @promotionID = ProductsInfo.promotionExists((select PromId from ProductsInfo.Promotion where PromDescription = @promotion))
-	set @productPromotionID = ProductsInfo.productPromotionExistsByName(@product, @promotion)
-	set @productStock = ProductsInfo.productStock(@product)
-	set @saleType = SalesInfo.saleType(@description)
+	set @saleID = SalesInfo.udf_saleExistsByDescription(@description)
+	set @productID = ProductsInfo.udf_productExists(@product)
+	set @promotionID = ProductsInfo.udf_promotionExists((select PromId from ProductsInfo.Promotion where PromDescription = @promotion))
+	set @productPromotionID = ProductsInfo.udf_productPromotionExistsByName(@product, @promotion)
+	set @productStock = ProductsInfo.udf_productStock(@product)
+	set @saleType = SalesInfo.udf_saleType(@description)
 
 	set @productType = (select pt.ProTypName
 						from ProductsInfo.Product p
@@ -295,7 +295,7 @@ AS
 
 	if @saleID != 0 and @productPromotionID != 0 and @productStock - @quantity >=0 and @promotionID != 0 and (@saleType = @productType or @saleType = 'notype') and @saleIsFinished = 0
 	begin
-		insert into SalesInfo.ProductPromotion_Sale values(@productPromotionID, @saleID, @quantity)
+		insert into SalesInfo.udf_ProductPromotion_Sale values(@productPromotionID, @saleID, @quantity)
 		
 		update ProductsInfo.Product
 		set ProdStock = @productStock - @quantity
@@ -308,12 +308,12 @@ AS
 		insert into UsersInfo.ErrorLog values(1, @error, GETDATE())
 	end
 GO
---EXEC SalesInfo.addProductToSale 'Large  replacement blades 18mm', 'No Promotion', 'Nova Venda2', 5;
---EXEC SalesInfo.addProductToSale 'USB food flash drive - chocolate bar', 'No Promotion', 'Nova Venda2', 5;
+--EXEC SalesInfo.sp_addProductToSale 'Large  replacement blades 18mm', 'No Promotion', 'Nova Venda2', 5;
+--EXEC SalesInfo.sp_addProductToSale 'USB food flash drive - chocolate bar', 'No Promotion', 'Nova Venda2', 5;
 GO
 
 --Alterar a quantidade de um produto numa venda
-CREATE OR ALTER PROCEDURE SalesInfo.changeProductQuantitySale @product VARCHAR(100), @promotion VARCHAR(100), @description VARCHAR(100), @quantity int
+CREATE OR ALTER PROCEDURE SalesInfo.sp_changeProductQuantitySale @product VARCHAR(100), @promotion VARCHAR(100), @description VARCHAR(100), @quantity int
 AS
 	declare
 		@saleID int,
@@ -327,12 +327,12 @@ AS
 		@saleIsFinished bit,
 		@error varchar(100)
 
-	set @saleID = SalesInfo.saleExistsByDescription(@description)
-	set @productID = ProductsInfo.productExists(@product)
-	set @promotionID = ProductsInfo.promotionExists((select PromId from ProductsInfo.Promotion where PromDescription = @promotion))
-	set @productPromotionID = ProductsInfo.productPromotionExistsByName(@product, @promotion)
-	set @productStock = ProductsInfo.productStock(@product)
-	set @saleType = SalesInfo.saleType(@description)
+	set @saleID = SalesInfo.udf_saleExistsByDescription(@description)
+	set @productID = ProductsInfo.udf_productExists(@product)
+	set @promotionID = ProductsInfo.udf_promotionExists((select PromId from ProductsInfo.Promotion where PromDescription = @promotion))
+	set @productPromotionID = ProductsInfo.udf_productPromotionExistsByName(@product, @promotion)
+	set @productStock = ProductsInfo.udf_productStock(@product)
+	set @saleType = SalesInfo.udf_saleType(@description)
 	
 	set @productType = (select pt.ProTypName
 						from ProductsInfo.Product p
@@ -363,11 +363,11 @@ AS
 		insert into UsersInfo.ErrorLog values(1, @error, GETDATE())
 	end
 GO
---EXEC SalesInfo.changeProductQuantitySale 'Large  replacement blades 18mm', 'No Promotion', 'Nova Venda2', 3;
+--EXEC SalesInfo.sp_changeProductQuantitySale 'Large  replacement blades 18mm', 'No Promotion', 'Nova Venda2', 3;
 GO
 
 --Remover um produto de uma venda
-CREATE OR ALTER PROCEDURE SalesInfo.removeProductSale @product VARCHAR(100), @promotion VARCHAR(100), @description VARCHAR(100)
+CREATE OR ALTER PROCEDURE SalesInfo.sp_removeProductSale @product VARCHAR(100), @promotion VARCHAR(100), @description VARCHAR(100)
 AS
 	declare
 		@saleID int,
@@ -381,12 +381,12 @@ AS
 		@saleIsFinished bit,
 		@error varchar(100)
 
-	set @saleID = SalesInfo.saleExistsByDescription(@description)
-	set @productID = ProductsInfo.productExists(@product)
-	set @promotionID = ProductsInfo.promotionExists((select PromId from ProductsInfo.Promotion where PromDescription = @promotion))
-	set @productPromotionID = ProductsInfo.productPromotionExistsByName(@product, @promotion)
-	set @productStock = ProductsInfo.productStock(@product)
-	set @saleType = SalesInfo.saleType(@description)
+	set @saleID = SalesInfo.udf_saleExistsByDescription(@description)
+	set @productID = ProductsInfo.udf_productExists(@product)
+	set @promotionID = ProductsInfo.udf_promotionExists((select PromId from ProductsInfo.Promotion where PromDescription = @promotion))
+	set @productPromotionID = ProductsInfo.udf_productPromotionExistsByName(@product, @promotion)
+	set @productStock = ProductsInfo.udf_productStock(@product)
+	set @saleType = SalesInfo.udf_saleType(@description)
 	
 	set @productType = (select pt.ProTypName
 						from ProductsInfo.Product p
@@ -415,20 +415,20 @@ AS
 		insert into UsersInfo.ErrorLog values(1, @error, GETDATE())
 	end
 GO
---EXEC SalesInfo.addProductToSale 'Large  replacement blades 18mm', 'No Promotion', 'Nova Venda2', 5;
---EXEC SalesInfo.removeProductSale 'Large  replacement blades 18mm', 'No Promotion', 'Nova Venda2';
---EXEC SalesInfo.addProductToSale 'USB food flash drive - chocolate bar', 'No Promotion', 'Nova Venda2', 5;
---EXEC SalesInfo.removeProductSale 'USB food flash drive - chocolate bar', 'No Promotion', 'Nova Venda2';
+--EXEC SalesInfo.sp_addProductToSale 'Large  replacement blades 18mm', 'No Promotion', 'Nova Venda2', 5;
+--EXEC SalesInfo.sp_removeProductSale 'Large  replacement blades 18mm', 'No Promotion', 'Nova Venda2';
+--EXEC SalesInfo.sp_addProductToSale 'USB food flash drive - chocolate bar', 'No Promotion', 'Nova Venda2', 5;
+--EXEC SalesInfo.sp_removeProductSale 'USB food flash drive - chocolate bar', 'No Promotion', 'Nova Venda2';
 GO
 
 --Finalizar uma venda
-CREATE OR ALTER PROCEDURE SalesInfo.finishSale @description VARCHAR(100)
+CREATE OR ALTER PROCEDURE SalesInfo.sp_finishSale @description VARCHAR(100)
 AS
 	declare
 		@saleID int,
 		@error varchar(100)
 
-	set @saleID = SalesInfo.saleExistsByDescription(@description)
+	set @saleID = SalesInfo.udf_saleExistsByDescription(@description)
 
 	if @saleID != 0
 	begin		
@@ -443,14 +443,14 @@ AS
 		insert into UsersInfo.ErrorLog values(1, @error, GETDATE())
 	end
 GO
---EXEC SalesInfo.finishSale 'Nova Venda1';
+--EXEC SalesInfo.sp_finishSale 'Nova Venda1';
 GO
 
  /********************************************
  * Functions
  ********************************************/
 --Função que retorna id se existir um user e 0 se não existir
-CREATE OR ALTER FUNCTION UsersInfo.userExistsByEmail (@email varchar(50))
+CREATE OR ALTER FUNCTION UsersInfo.udf_userExistsByEmail (@email varchar(50))
 RETURNS int
 BEGIN
 	declare @result int
@@ -466,12 +466,12 @@ BEGIN
 	return @result
 END;
 GO
---select UsersInfo.userExistsByEmail('nunoreis294@gmail.com');
+--select UsersInfo.udf_userExistsByEmail('nunoreis294@gmail.com');
 GO
 
 
 --Função que retorna um numero se existirem erros associados um user e 0 se não existir
-CREATE OR ALTER FUNCTION UsersInfo.userHasErrors (@id int)
+CREATE OR ALTER FUNCTION UsersInfo.udf_userHasErrors (@id int)
 RETURNS int
 BEGIN
 	declare @result int
@@ -487,11 +487,11 @@ BEGIN
 	return @result
 END;
 GO
---select UsersInfo.userHasErrors(420);
+--select UsersInfo.udf_userHasErrors(420);
 GO
 
 --Função que retorna o id se existir um token valido associado um user e 0 se não existir
-CREATE OR ALTER FUNCTION UsersInfo.tokenExists (@userID int, @token int)
+CREATE OR ALTER FUNCTION UsersInfo.udf_tokenExists (@userID int, @token int)
 RETURNS int
 BEGIN
 	declare @result int
@@ -507,11 +507,11 @@ BEGIN
 	return @result
 END;
 GO
---select UsersInfo.tokenExists(421, 446969);
+--select UsersInfo.udf_tokenExists(421, 446969);
 GO
 
 --Função que retorna id se existir um product associado a uma pormoção e 0 se não existir
-CREATE OR ALTER FUNCTION ProductsInfo.productPromotionExistsByName (@name varchar(100), @promotion varchar(100))
+CREATE OR ALTER FUNCTION ProductsInfo.udf_productPromotionExistsByName (@name varchar(100), @promotion varchar(100))
 RETURNS int
 BEGIN
 	declare @result int,
@@ -532,11 +532,11 @@ BEGIN
 	
 	return @result
 END;
---select ProductsInfo.productPromotionExistsByName('Void fill 400 L bag (White) 400L', 'No Promotion');
+--select ProductsInfo.udf_productPromotionExistsByName('Void fill 400 L bag (White) 400L', 'No Promotion');
 GO
 
 --Função que retorna id se existir uma venda e 0 se não existir
-CREATE OR ALTER FUNCTION SalesInfo.saleExistsByDescription (@description varchar(100))
+CREATE OR ALTER FUNCTION SalesInfo.udf_saleExistsByDescription (@description varchar(100))
 RETURNS int
 BEGIN
 	declare @result int
@@ -552,11 +552,11 @@ BEGIN
 	
 	return @result
 END;
---select SalesInfo.saleExistsByDescription('Nova Venda1');
+--select SalesInfo.udf_saleExistsByDescription('Nova Venda1');
 GO
 
 --Função que retorna o stock de um produto e 0 se não existir esse produto
-CREATE OR ALTER FUNCTION ProductsInfo.productStock (@product varchar(100))
+CREATE OR ALTER FUNCTION ProductsInfo.udf_productStock (@product varchar(100))
 RETURNS int
 BEGIN
 	declare @result int
@@ -572,11 +572,11 @@ BEGIN
 	
 	return @result
 END;
---select ProductsInfo.productStock('Void fill 400 L bag (White) 400L');
+--select ProductsInfo.udf_productStock('Void fill 400 L bag (White) 400L');
 GO
 
 --Função que retorna o tipo de venda e 0 se não existir essa venda
-CREATE OR ALTER FUNCTION SalesInfo.saleType (@sale varchar(100))
+CREATE OR ALTER FUNCTION SalesInfo.udf_saleType (@sale varchar(100))
 RETURNS varchar(20)
 BEGIN
 	declare @result varchar(20)
@@ -600,32 +600,5 @@ BEGIN
 	
 	return @result
 END;
---select SalesInfo.saleType('Nova Venda1');
+--select SalesInfo.udf_saleType('Nova Venda1');
 GO
-
-/*CREATE FUNCTION UserInfo.ufn_SalesByStore (@storeid int)
-RETURNS TABLE
-AS
-RETURN
-(
-    SELECT P.ProductID, P.Name, SUM(SD.LineTotal) AS 'Total'
-    FROM Production.Product AS P
-    JOIN Sales.SalesOrderDetail AS SD ON SD.ProductID = P.ProductID
-    JOIN Sales.SalesOrderHeader AS SH ON SH.SalesOrderID = SD.SalesOrderID
-    JOIN Sales.Customer AS C ON SH.CustomerID = C.CustomerID
-    WHERE C.StoreID = @storeid
-    GROUP BY P.ProductID, P.Name
-);
-GO
-SELECT * FROM Sales.ufn_SalesByStore (602);*/
-
-/*CREATE PROCEDURE HumanResources.uspGetEmployeesTest2 @LastName nvarchar(50), @FirstName nvarchar(50)   
-AS   
-
-    SET NOCOUNT ON;  
-    SELECT FirstName, LastName, Department  
-    FROM HumanResources.vEmployeeDepartmentHistory  
-    WHERE FirstName = @FirstName AND LastName = @LastName  
-    AND EndDate IS NULL;  
-GO  
-EXECUTE HumanResources.uspGetEmployeesTest2 N'Ackerman', N'Pilar'; */

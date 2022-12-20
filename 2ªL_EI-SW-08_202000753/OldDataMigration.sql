@@ -1,21 +1,21 @@
- /********************************************
- *	UC: Complementos de Bases de Dados 2022/2023
- *
- *	Projeto 1ª Fase - Migração das tabelas antigas para as novas
- *		Nuno Reis (202000753)
- *			Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
- *
- ********************************************/
+/********************************************
+*	UC: Complementos de Bases de Dados 2022/2023
+*
+*	Projeto 1ª Fase - Migração das tabelas antigas para as novas
+*		Nuno Reis (202000753)
+*			Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
+*
+********************************************/
 USE WWIGlobal
 GO
 
 --Função que retorna o id se existir um pais de um continente e 0 se não existir
-CREATE OR ALTER FUNCTION UsersInfo.countryExists (@country varchar(30))
+CREATE OR ALTER FUNCTION HR.udf_countryExists (@country varchar(30))
 RETURNS int
 BEGIN
 	declare @result int
 	set @result =(select CouID
-		from UsersInfo.Country
+		from HR.Country
 		where CouName = @country)
 
 	if @result is null
@@ -25,11 +25,11 @@ BEGIN
 	
 	return @result
 END;
---select UsersInfo.countryExists('United States');
+--select RH.udf_countryExists('United States');
 GO
 
 --Função que retorna id se existir um estado e 0 se não existir
-CREATE OR ALTER FUNCTION UsersInfo.stateExistsByName (@StateProvince varchar(50))
+CREATE OR ALTER FUNCTION UsersInfo.udf_stateExistsByName (@StateProvince varchar(50))
 RETURNS int
 BEGIN
 	declare @result int
@@ -44,11 +44,11 @@ BEGIN
 	
 	return @result
 END;
---select UsersInfo.stateExistsByName('Florida');
+--select UsersInfo.udf_stateExistsByName('Pennsylvania');
 GO
 
 --Função que retorna id se existir um estado e 0 se não existir
-CREATE OR ALTER FUNCTION UsersInfo.stateExistsByCode (@StateProvince varchar(30))
+CREATE OR ALTER FUNCTION UsersInfo.udf_stateExistsByCode (@StateProvince varchar(30))
 RETURNS int
 BEGIN
 	declare @result int
@@ -63,11 +63,11 @@ BEGIN
 	
 	return @result
 END;
---select UsersInfo.stateExistsByCode('Fl');
+--select UsersInfo.udf_stateExistsByCode('PA');
 GO
 
 --Função que retorna id se existir uma cidade e 0 se não existir
-CREATE OR ALTER FUNCTION UsersInfo.cityExists (@City varchar(50))
+CREATE OR ALTER FUNCTION UsersInfo.udf_cityExists (@City varchar(50))
 RETURNS int
 BEGIN
 	declare @result int
@@ -82,11 +82,11 @@ BEGIN
 	
 	return @result
 END;
---select UsersInfo.cityExists('Powell');
+--select UsersInfo.udf_cityExists('Abbottsburg');
 GO
 
 --Função que retorna id se existir uma categoria e 0 se não existir
-CREATE OR ALTER FUNCTION UsersInfo.categoryExists (@Category varchar(30))
+CREATE OR ALTER FUNCTION UsersInfo.udf_categoryExists (@Category varchar(30))
 RETURNS int
 BEGIN
 	declare @result int
@@ -101,11 +101,11 @@ BEGIN
 	
 	return @result
 END;
---select UsersInfo.categoryExists('Kiosk');
+--select UsersInfo.udf_categoryExists('Kiosk');
 GO
 
 --Função que retorna id se existir um buying group e 0 se não existir
-CREATE OR ALTER FUNCTION UsersInfo.buyingGroupExists (@buyingGroup varchar(30))
+CREATE OR ALTER FUNCTION UsersInfo.udf_buyingGroupExists (@buyingGroup varchar(30))
 RETURNS int
 BEGIN
 	declare @result int
@@ -120,20 +120,20 @@ BEGIN
 	
 	return @result
 END;
---select UsersInfo.buyingGroupExists('Tailspin Toys');
+--select UsersInfo.udf_buyingGroupExists('Tailspin Toys');
 GO
 
-CREATE or alter FUNCTION UsersInfo.fnHashPassword (@password VARCHAR(20))
+CREATE or alter FUNCTION UsersInfo.udf_fnHashPassword (@password VARCHAR(20))
 Returns varchar(20)
 AS
 BEGIN
 	return HASHBYTES('SHA1', @password)
 END;
---select UsersInfo.fnHashPassword('Pass123');
+--select UsersInfo.udf_fnHashPassword('Pass123');
 GO
 
 --Função que retorna id se existir um user e 0 se não existir
-CREATE OR ALTER FUNCTION UsersInfo.userExistsByName (@name varchar(50))
+CREATE OR ALTER FUNCTION UsersInfo.udf_userExistsByName (@name varchar(50))
 RETURNS int
 BEGIN
 	declare @result int
@@ -148,11 +148,11 @@ BEGIN
 	
 	return @result
 END;
---select UsersInfo.userExistsByName('Tailspin Toys (Peeples Valley, AZ)');
+--select UsersInfo.udf_userExistsByName('Tailspin Toys (Peeples Valley, AZ)');
 GO
 
 --Função que retorna id se existir uma região associada a uma categoria e 0 se não existir
-CREATE OR ALTER FUNCTION UsersInfo.Region_CategoryExists (@State varchar(30), @City varchar(30), @Category varchar(30))
+CREATE OR ALTER FUNCTION UsersInfo.udf_Region_CategoryExists (@State varchar(30), @City varchar(30), @Category varchar(30))
 RETURNS int
 BEGIN
 	declare @result int,
@@ -160,9 +160,9 @@ BEGIN
 			@CityID int,
 			@CategoryID int
 		
-	set @StateID = UsersInfo.stateExistsByCode(@State)
-	set @CityID = UsersInfo.cityExists(@City)
-	set @CategoryID = UsersInfo.categoryExists(@Category)
+	set @StateID = UsersInfo.udf_stateExistsByCode(@State)
+	set @CityID = UsersInfo.udf_cityExists(@City)
+	set @CategoryID = UsersInfo.udf_categoryExists(@Category)
 	
 	set @result =(select Reg_CatId
 					from UsersInfo.Region_Category
@@ -175,11 +175,11 @@ BEGIN
 	
 	return @result
 END;
---select UsersInfo.Region_CategoryExists('MT', 'Sylvanite', 'Kiosk ');
+--select UsersInfo.udf_Region_CategoryExists('MT', 'Sylvanite', 'Kiosk ');
 GO
 
 --Função que retorna id se existir uma customer e 0 se não existir
-CREATE OR ALTER FUNCTION UsersInfo.CustomerExists (@UserID int)
+CREATE OR ALTER FUNCTION UsersInfo.udf_CustomerExists (@UserID int)
 RETURNS int
 BEGIN
 	declare @result int
@@ -195,11 +195,11 @@ BEGIN
 	
 	return @result
 END;
---select UsersInfo.CustomerExists(1);
+--select UsersInfo.udf_CustomerExists(1);
 GO
 
 --Função que retorna id se existir uma customer e 0 se não existir
-CREATE OR ALTER FUNCTION UsersInfo.EmployeeExists (@UserID int)
+CREATE OR ALTER FUNCTION UsersInfo.udf_EmployeeExists (@UserID int)
 RETURNS int
 BEGIN
 	declare @result int
@@ -215,11 +215,11 @@ BEGIN
 	
 	return @result
 END;
---select UsersInfo.EmployeeExists(1);
+--select UsersInfo.udf_EmployeeExists(1);
 GO
 
 --Função que retorna id se existir um package e 0 se não existir
-CREATE OR ALTER FUNCTION ProductsInfo.packageExists (@name varchar(50))
+CREATE OR ALTER FUNCTION ProductsInfo.udf_packageExists (@name varchar(50))
 RETURNS int
 BEGIN
 	declare @result int
@@ -234,11 +234,11 @@ BEGIN
 	
 	return @result
 END;
---select ProductsInfo.packageExists('Each');
+--select ProductsInfo.udf_packageExists('Each');
 GO
 
 --Função que retorna id se existir uma brand e 0 se não existir
-CREATE OR ALTER FUNCTION ProductsInfo.brandExists (@name varchar(50))
+CREATE OR ALTER FUNCTION ProductsInfo.udf_brandExists (@name varchar(50))
 RETURNS int
 BEGIN
 	declare @result int
@@ -253,11 +253,11 @@ BEGIN
 	
 	return @result
 END;
---select ProductsInfo.brandExists('Northwind');
+--select ProductsInfo.udf_brandExists('Northwind');
 GO
 
 --Função que retorna id se existir um product type e 0 se não existir
-CREATE OR ALTER FUNCTION ProductsInfo.productTypeExists (@name varchar(50))
+CREATE OR ALTER FUNCTION ProductsInfo.udf_productTypeExists (@name varchar(50))
 RETURNS int
 BEGIN
 	declare @result int
@@ -272,11 +272,11 @@ BEGIN
 	
 	return @result
 END;
---select ProductsInfo.productTypeExists('Dry');
+--select ProductsInfo.udf_productTypeExists('Dry');
 GO
 
 --Função que retorna id se existir uma taxRate e 0 se não existir
-CREATE OR ALTER FUNCTION ProductsInfo.taxRateExists (@tax float)
+CREATE OR ALTER FUNCTION ProductsInfo.udf_taxRateExists (@tax float)
 RETURNS int
 BEGIN
 	declare @result int
@@ -291,11 +291,11 @@ BEGIN
 	
 	return @result
 END;
---select ProductsInfo.taxRateExists(14.00);
+--select ProductsInfo.udf_taxRateExists(14.00);
 GO
 
 --Função que retorna id se existir um product e 0 se não existir
-CREATE OR ALTER FUNCTION ProductsInfo.productExists (@name varchar(100))
+CREATE OR ALTER FUNCTION ProductsInfo.udf_productExists (@name varchar(100))
 RETURNS int
 BEGIN
 	declare @result int
@@ -310,11 +310,11 @@ BEGIN
 	
 	return @result
 END;
---select ProductsInfo.productExists('Void fill 400 L bag (White) 400L');
+--select ProductsInfo.udf_productExists('Void fill 400 L bag (White) 400L');
 GO
 
 --Função que retorna id se existir uma promoção e 0 se não existir
-CREATE OR ALTER FUNCTION ProductsInfo.promotionExists (@id int)
+CREATE OR ALTER FUNCTION ProductsInfo.udf_promotionExists (@id int)
 RETURNS int
 BEGIN
 	declare @result int
@@ -329,17 +329,17 @@ BEGIN
 	
 	return @result
 END;
---select ProductsInfo.promotionExists(1);
+--select ProductsInfo.udf_promotionExists(1);
 GO
 
 --Função que retorna id se existir um product associado a uma pormoção e 0 se não existir
-CREATE OR ALTER FUNCTION ProductsInfo.productPromotionExists (@name varchar(100), @id int)
+CREATE OR ALTER FUNCTION ProductsInfo.udf_productPromotionExists (@name varchar(100), @id int)
 RETURNS int
 BEGIN
 	declare @result int,
 		@productID int
 
-	set @productID = ProductsInfo.productExists(@name)
+	set @productID = ProductsInfo.udf_productExists(@name)
 
 	set @result =(select Prod_PromProductPromotionId
 				from ProductsInfo.Product_Promotion
@@ -352,11 +352,11 @@ BEGIN
 	
 	return @result
 END;
---select ProductsInfo.productPromotionExists('Void fill 400 L bag (White) 400L', 1);
+--select ProductsInfo.udf_productPromotionExists('Void fill 400 L bag (White) 400L', 1);
 GO
 
 --Função que retorna id se existir uma venda  e 0 se não existir
-CREATE OR ALTER FUNCTION SalesInfo.vendaExists (@saleID int)
+CREATE OR ALTER FUNCTION SalesInfo.udf_vendaExists (@saleID int)
 RETURNS int
 BEGIN
 	declare @result int
@@ -372,11 +372,11 @@ BEGIN
 	
 	return @result
 END;
---select SalesInfo.vendaExists(1);
+--select SalesInfo.udf_vendaExists(1);
 GO
 
 --Função que retorna id se existir uma venda associado a um produto/promoção e 0 se não existir
-CREATE OR ALTER FUNCTION SalesInfo.productPromotion_VendaExists (@saleID int, @productPromotionID int)
+CREATE OR ALTER FUNCTION SalesInfo.udf_productPromotion_VendaExists (@saleID int, @productPromotionID int)
 RETURNS int
 BEGIN
 	declare @result int
@@ -394,11 +394,11 @@ BEGIN
 	
 	return @result
 END;
---select SalesInfo.productPromotion_VendaExists(1, 1);
+--select SalesInfo.udf_productPromotion_VendaExists(1, 1);
 GO
 
 --Procedimento que importa os dados da tabela OldData.City para as novas tabelas UsersInfo.Country, UsersInfo.StateProvince, UsersInfo.City
-CREATE OR ALTER PROCEDURE Migrate_OldData_CityTable
+CREATE OR ALTER PROCEDURE sp_Migrate_OldData_CityTable
 AS
 BEGIN
 	DECLARE cityCursor CURSOR  
@@ -425,21 +425,33 @@ BEGIN
 	WHILE @@FETCH_STATUS = 0 
 	BEGIN
 		--Country
-		IF UsersInfo.countryExists (@Country) = 0
+		IF UsersInfo.udf_countryExists (@Country) = 0
 		BEGIN
-			insert into UsersInfo.Country values(@Country, @Continent)
+			insert into UsersInfo.udf_Country values(@Country, @Continent)
+		END
+		ELSE
+		BEGIN
+			print 'Este pais já existe - Migrate_OldData_CityTable'
 		END
 
 		--StateProvince
-		IF UsersInfo.stateExistsByName (@StateProvince) = 0
+		IF UsersInfo.udf_stateExistsByName (@StateProvince) = 0
 		BEGIN
-			insert into UsersInfo.StateProvince (StaProName) values(@StateProvince)
+			insert into UsersInfo.udf_StateProvince (StaProName) values(@StateProvince)
+		END
+		ELSE
+		BEGIN
+			print 'Este estado já existe - Migrate_OldData_CityTable'
 		END
 
 		--City
-		IF UsersInfo.cityExists (@City) = 0
+		IF UsersInfo.udf_cityExists (@City) = 0
 		BEGIN
-			insert into UsersInfo.City (CitName, CitSalesTerritory, CitLasPopulationRecord) values(@City, @SalesTerritory, @LatestRecordedPopulation)
+			insert into UsersInfo.udf_City (CitName, CitSalesTerritory, CitLasPopulationRecord) values(@City, @SalesTerritory, @LatestRecordedPopulation)
+		END
+		ELSE
+		BEGIN
+			print 'Este estado já existe - Migrate_OldData_CityTable'
 		END
 
 		FETCH NEXT FROM cityCursor INTO 
@@ -456,7 +468,7 @@ END;
 GO
 
 --Procedimento que importa os dados da tabela OldData.States para a nova tabela UsersInfo.StateProvince
-CREATE OR ALTER PROCEDURE Migrate_OldData_StatesTable
+CREATE OR ALTER PROCEDURE sp_Migrate_OldData_StatesTable
 AS
 BEGIN
 	DECLARE stateCursor CURSOR  
@@ -475,7 +487,7 @@ BEGIN
 	WHILE @@FETCH_STATUS = 0 
 	BEGIN
 		--State
-		IF UsersInfo.stateExistsByName (@Name) = 0
+		IF UsersInfo.udf_stateExistsByName (@Name) = 0 and UsersInfo.udf_stateExistsByCode (@Code) = 0
 		BEGIN
 			insert into UsersInfo.StateProvince (StaProName, StaProCode) values(@Name, @Code)
 		END
@@ -483,11 +495,12 @@ BEGIN
 		ELSE
 		BEGIN
 			declare @StateID int
-			set @StateID = UsersInfo.stateExistsByName (@Name)
+			set @StateID = UsersInfo.udf_stateExistsByName (@Name)
 			
 			UPDATE UsersInfo.StateProvince
 			SET StaProCode = @Code
 			WHERE StaProID = @StateID;
+			print 'Este estado já existe - Migrate_OldData_StatesTable'
 		END
 
 		FETCH NEXT FROM stateCursor INTO
@@ -500,7 +513,7 @@ END;
 GO
 
 --Procedimento que importa os dados da tabela OldData.lookup para a nova tabela UsersInfo.Category
-CREATE OR ALTER PROCEDURE Migrate_OldData_lookupTable
+CREATE OR ALTER PROCEDURE sp_Migrate_OldData_lookupTable
 AS
 BEGIN
 	DECLARE lookupCursor CURSOR  
@@ -517,9 +530,13 @@ BEGIN
 	WHILE @@FETCH_STATUS = 0 
 	BEGIN
 		--Category
-		IF UsersInfo.categoryExists (@Name) = 0
+		IF UsersInfo.udf_categoryExists (@Name) = 0
 		BEGIN
-			insert into UsersInfo.Category (CatName) values(@Name)
+			insert into UsersInfo.udf_Category (CatName) values(@Name)
+		END
+		ELSE
+		BEGIN
+			print 'Esta categoria já existe - Migrate_OldData_lookupTable'
 		END
 
 		FETCH NEXT FROM lookupCursor INTO
@@ -531,10 +548,13 @@ END;
 GO
 
 --Procedimento que importa os dados da tabela OldData.Customer para as novas tabelas UsersInfo.SysUser, UsersInfo.Customer, UsersInfo.Region_Category e UsersInfo.BuyingGroup
-CREATE OR ALTER PROCEDURE Migrate_OldData_CustomerTable
+CREATE OR ALTER PROCEDURE sp_Migrate_OldData_CustomerTable
 AS
 BEGIN
-	insert into UsersInfo.SysUser (SysUseEmail, SysUsePassword, SysUseName) values(' ', ' ', 'Sys')
+	declare @Pass varchar(20)
+	SET @Pass = (UsersInfo.udf_fnHashPassword('Pass123'));
+
+	insert into UsersInfo.SysUser (SysUseEmail, SysUsePassword, SysUseName) values('admin@WWWIGlobal.com', @Pass, 'Admin')
 		
 	DECLARE customerCursor CURSOR  
 		FOR SELECT Customer, [Bill To Customer], Category, [Buying Group], [Primary Contact], [Postal Code]
@@ -553,8 +573,7 @@ BEGIN
 		@SecondSplit varchar(50),
 		@City varchar(50),
 		@State varchar(50),
-		@Mail varchar(50),
-		@Pass varchar(20)
+		@Mail varchar(50)
 
 	declare
 		@result int, 
@@ -577,8 +596,6 @@ BEGIN
 					  from UsersInfo.StateProvince
 					  where StaProId = 1)
 
-	SET @Pass = (UsersInfo.fnHashPassword('Pass123'));
-
 	OPEN customerCursor 
 	FETCH NEXT FROM customerCursor INTO 
 		@Customer,
@@ -591,18 +608,26 @@ BEGIN
 	WHILE @@FETCH_STATUS = 0 
 	BEGIN
 		--Category
-		IF UsersInfo.categoryExists (@Category) = 0
+		IF UsersInfo.udf_categoryExists (@Category) = 0
 		BEGIN
 			insert into UsersInfo.Category (CatName) values(@Category)
 		END
+		ELSE
+		BEGIN
+			print 'Esta categoria já existe - Migrate_OldData_CustomerTable'
+		END
 
 		--Buting Group
-		IF UsersInfo.buyingGroupExists (@BuyingGroup) = 0
+		IF UsersInfo.udf_buyingGroupExists (@BuyingGroup) = 0
 		BEGIN
 			insert into UsersInfo.BuyingGroup (BuyGrouName) values(@BuyingGroup)
 		END
+		ELSE
+		BEGIN
+			print 'Este buying group já existe - Migrate_OldData_CustomerTable'
+		END
 
-		IF UsersInfo.userExistsByName (@Customer) = 0
+		IF UsersInfo.udf_userExistsByName (@Customer) = 0
 		BEGIN
 			DECLARE splitCursor CURSOR  
 				FOR SELECT * from string_split(@Customer, '(');
@@ -625,15 +650,23 @@ BEGIN
 				
 				WHILE @@FETCH_STATUS = 0 
 				BEGIN
-					if(UsersInfo.cityExists(REPLACE(@SecondSplit,')','')) != 0)
+					if(UsersInfo.udf_cityExists(REPLACE(@SecondSplit,')','')) != 0)
 					begin
 						set @City = REPLACE(REPLACE(@SecondSplit,')',''),' ','_')
 					end
+					ELSE
+					BEGIN
+						print 'Não existe nenhuma cidade com este nome - Migrate_OldData_CustomerTable'
+					END
 					
-					if(UsersInfo.stateExistsByCode(REPLACE(REPLACE(@SecondSplit,')',''),' ','')) != 0)
+					if(UsersInfo.udf_stateExistsByCode(REPLACE(REPLACE(@SecondSplit,')',''),' ','')) != 0)
 					begin
 						set @State = REPLACE(REPLACE(@SecondSplit,')',''),' ','')
 					end
+					ELSE
+					BEGIN
+						print 'Não existe nenhum estado com este nome - Migrate_OldData_CustomerTable'
+					END
 
 					FETCH NEXT FROM SecondSplitCursor INTO
 						@SecondSplit
@@ -648,6 +681,7 @@ BEGIN
 				end
 				else
 				begin
+					print 'HeadOffice user - Migrate_OldData_CustomerTable'
 					set @Mail = 'HeadOffice@' + REPLACE(@BuyingGroup,' ','_')+ '.com'
 				end
 
@@ -658,6 +692,10 @@ BEGIN
 			DEALLOCATE splitCursor
 			
 			insert into UsersInfo.SysUser (SysUseEmail, SysUsePassword, SysUseName) values(@Mail, @Pass, @Customer)
+		END
+		ELSE
+		BEGIN
+			print 'Este utilizador já existe - Migrate_OldData_CustomerTable'
 		END
 
 		DECLARE splitCursor CURSOR  
@@ -681,15 +719,23 @@ BEGIN
 				
 			WHILE @@FETCH_STATUS = 0 
 			BEGIN
-				if(UsersInfo.cityExists(REPLACE(@SecondSplit,')','')) != 0)
+				if(UsersInfo.udf_cityExists(REPLACE(@SecondSplit,')','')) != 0)
 				begin
 					set @City = REPLACE(REPLACE(@SecondSplit,')',''),' ','_')
 				end
+				ELSE
+				BEGIN
+					print 'Não existe nenhuma cidade com este nome - Migrate_OldData_CustomerTable'
+				END
 					
-				if(UsersInfo.stateExistsByCode(REPLACE(REPLACE(@SecondSplit,')',''),' ','')) != 0)
+				if(UsersInfo.udf_stateExistsByCode(REPLACE(REPLACE(@SecondSplit,')',''),' ','')) != 0)
 				begin
 					set @State = REPLACE(REPLACE(@SecondSplit,')',''),' ','')
 				end
+				ELSE
+				BEGIN
+					print 'Não existe nenhum estado com este nome - Migrate_OldData_CustomerTable'
+				END
 
 				FETCH NEXT FROM SecondSplitCursor INTO
 					@SecondSplit
@@ -703,45 +749,51 @@ BEGIN
 		CLOSE splitCursor 
 		DEALLOCATE splitCursor
 		
-		set @CategoryID = UsersInfo.categoryExists(@Category)
+		set @CategoryID = UsersInfo.udf_categoryExists(@Category)
 
 		--Region Category
 		IF @Customer not like '%Head Office%'
 		BEGIN
-			IF UsersInfo.Region_CategoryExists (@State, REPLACE(@City,'_',' '), @Category) = 0
+			IF UsersInfo.udf_Region_CategoryExists (@State, REPLACE(@City,'_',' '), @Category) = 0
 			BEGIN
-				set @StateID = UsersInfo.stateExistsByCode(@State)
-				set @CityID = UsersInfo.cityExists(REPLACE(@City,'_',' '))
-				set @CountryID = UsersInfo.countryExists('United States')
+				set @StateID = UsersInfo.udf_stateExistsByCode(@State)
+				set @CityID = UsersInfo.udf_cityExists(REPLACE(@City,'_',' '))
+				set @CountryID = UsersInfo.udf_countryExists('United States')
 			
 				insert into UsersInfo.Region_Category (Reg_CatCitStateProvinceId, Reg_CatCityId, Reg_CatCategoryId, Reg_CatCountryId, Reg_CatPostalCode) values(@StateID, @CityID, @CategoryID, @CountryID, @PostalCode)
 			END
 		END
-		ELSE IF UsersInfo.Region_CategoryExists (@FirstStateCode, @FirstCity, @Category) = 0
+		ELSE IF UsersInfo.udf_Region_CategoryExists (@FirstStateCode, @FirstCity, @Category) = 0
 		BEGIN
-			set @CategoryID = UsersInfo.categoryExists(@Category)
+			print 'Esta relação entre customer e region category já existe - Migrate_OldData_CustomerTable'
+			set @CategoryID = UsersInfo.udf_categoryExists(@Category)
 
 			insert into UsersInfo.Region_Category (Reg_CatCitStateProvinceId, Reg_CatCityId, Reg_CatCategoryId, Reg_CatCountryId, Reg_CatPostalCode) values(1, 1, @CategoryID, 1, @PostalCode)
 		END
 		
 		--Customer
-		set @UserID = UsersInfo.userExistsByName(@Customer)
-		IF UsersInfo.CustomerExists (@UserID) = 0
+		set @UserID = UsersInfo.udf_userExistsByName(@Customer)
+		IF UsersInfo.udf_CustomerExists (@UserID) = 0
 		BEGIN
 			IF @Customer not like '%Head Office%'
 			BEGIN		
-				set @BuyingGroupID = UsersInfo.buyingGroupExists(@BuyingGroup)
-				set @RegionCategoryID = UsersInfo.Region_CategoryExists(@State, REPLACE(@City,'_',' '), @Category)
-				set @HeadquartersID = UsersInfo.userExistsByName(@BillToCustomer)
+				set @BuyingGroupID = UsersInfo.udf_buyingGroupExists(@BuyingGroup)
+				set @RegionCategoryID = UsersInfo.udf_Region_CategoryExists(@State, REPLACE(@City,'_',' '), @Category)
+				set @HeadquartersID = UsersInfo.udf_userExistsByName(@BillToCustomer)
 				
 				insert into UsersInfo.Customer (CusUserId, CusHeadquartersId, CusRegion_CategoryId, CusBuyingGroupId, CusPrimaryContact) values(@UserID, @HeadquartersID, @RegionCategoryID, @BuyingGroupID, @PrimaryContact)
 			END
 			ELSE
 			BEGIN
-				set @BuyingGroupID = UsersInfo.buyingGroupExists(@BuyingGroup)
+				print 'HeadOffice user - Migrate_OldData_CustomerTable'
+				set @BuyingGroupID = UsersInfo.udf_buyingGroupExists(@BuyingGroup)
 
-				insert into UsersInfo.Customer (CusUserId, CusHeadquartersId, CusRegion_CategoryId, CusBuyingGroupId, CusPrimaryContact) values(@UserID, @UserID, @RegionCategoryID, @BuyingGroupID, @PrimaryContact)
+				insert into UsersInfo.Customer (CusUserId, CusHeadquartersId, CusRegion_CategoryId, CusBuyingGroupId, CusPrimaryContact) values(@UserID, @UserID, 1, @BuyingGroupID, @PrimaryContact)
 			END
+		END
+		ELSE
+		BEGIN
+			print 'Este customer já existe - Migrate_OldData_CustomerTable'
 		END
 
 		FETCH NEXT FROM customerCursor INTO
@@ -758,7 +810,7 @@ END;
 GO
 
 --Procedimento que importa os dados da tabela OldData.Employee para as novas tabelas UsersInfo.SysUser e UsersInfo.Employee
-CREATE OR ALTER PROCEDURE Migrate_OldData_EmployeeTable
+CREATE OR ALTER PROCEDURE sp_Migrate_OldData_EmployeeTable
 AS
 BEGIN
 	DECLARE employeeCursor CURSOR  
@@ -775,7 +827,7 @@ BEGIN
 		@Pass varchar(50),
 		@Mail varchar(50)
 
-	SET @Pass = (UsersInfo.fnHashPassword('Pass123'));
+	SET @Pass = (UsersInfo.udf_fnHashPassword('Pass123'));
 
 	OPEN employeeCursor 
 	FETCH NEXT FROM employeeCursor INTO 
@@ -788,17 +840,25 @@ BEGIN
 		set @Mail = REPLACE(@Employee,' ','_')+ '@employees.com'
 
 		--User
-		IF UsersInfo.userExistsByName (@Employee) = 0
+		IF UsersInfo.udf_userExistsByName (@Employee) = 0
 		BEGIN
 			insert into UsersInfo.SysUser (SysUseEmail, SysUsePassword, SysUseName) values(@Mail, @Pass, @Employee)
 		END
+		ELSE
+		BEGIN
+			print 'Este utilizador já existe - Migrate_OldData_EmployeeTable'
+		END
 
-		set @UserID = UsersInfo.userExistsByName(@Employee)
+		set @UserID = UsersInfo.udf_userExistsByName(@Employee)
 
 		--Employee
-		IF UsersInfo.EmployeeExists (@UserID) = 0
+		IF UsersInfo.udf_EmployeeExists (@UserID) = 0
 		BEGIN
 			insert into UsersInfo.Employee (EmpUserId, EmpPreferedName, EmpIsSalesPerson) values(@UserID, @PreferredName, @IsSalesperson)
+		END
+		ELSE
+		BEGIN
+			print 'Este employee já existe - Migrate_OldData_EmployeeTable'
 		END
 
 		FETCH NEXT FROM employeeCursor INTO
@@ -812,7 +872,7 @@ END;
 GO
 
 --Procedimento que importa os dados da tabela OldData.Item Stock para as novas tabelas ProductsInfo.Package, ProductsInfo.Brand, ProductsInfo.TaxRate, ProductsInfo.ProductType, ProductsInfo.Product e ProductsInfo.Product_Promotion
-CREATE OR ALTER PROCEDURE Migrate_OldData_ItemStockTable
+CREATE OR ALTER PROCEDURE sp_Migrate_OldData_ItemStockTable
 AS
 BEGIN
 	DECLARE productCursor CURSOR  
@@ -862,59 +922,74 @@ BEGIN
 	WHILE @@FETCH_STATUS = 0 
 	BEGIN
 		--Selling Package
-		IF ProductsInfo.packageExists (@SellingPackage) = 0
+		IF ProductsInfo.udf_packageExists (@SellingPackage) = 0
 		BEGIN
 			insert into ProductsInfo.Package(PacPackage) values(@SellingPackage)
 		END
+		ELSE
+		BEGIN
+			print 'Este package já existe - Migrate_OldData_ItemStockTable'
+		END
 
-		set @SellingPackageID = ProductsInfo.packageExists(@SellingPackage)
+		set @SellingPackageID = ProductsInfo.udf_packageExists(@SellingPackage)
 
 		--Buying Package
-		IF ProductsInfo.packageExists (@BuyingPackage) = 0
+		IF ProductsInfo.udf_packageExists (@BuyingPackage) = 0
 		BEGIN
 			insert into ProductsInfo.Package(PacPackage) values(@BuyingPackage)
 		END
+		ELSE
+		BEGIN
+			print 'Este package já existe - Migrate_OldData_ItemStockTable'
+		END
 
-		set @BuyingPackageID = ProductsInfo.packageExists(@BuyingPackage)
+		set @BuyingPackageID = ProductsInfo.udf_packageExists(@BuyingPackage)
 
 		--Brand
-		IF ProductsInfo.brandExists (@Brand) = 0
+		IF ProductsInfo.udf_brandExists (@Brand) = 0
 		BEGIN
 			insert into ProductsInfo.Brand(BraName) values(@Brand)
 		END
+		ELSE
+		BEGIN
+			print 'Esta brand já existe - Migrate_OldData_ItemStockTable'
+		END
 
-		set @BrandID = ProductsInfo.brandExists(@Brand)
+		set @BrandID = ProductsInfo.udf_brandExists(@Brand)
 
 		--Product Type
-		IF ProductsInfo.productTypeExists('Dry') = 0
+		IF ProductsInfo.udf_productTypeExists('Dry') = 0
 		BEGIN
 			insert into ProductsInfo.ProductType(ProTypName) values('Dry')
 		END
-
-		IF ProductsInfo.productTypeExists('Chiller') = 0
+		IF ProductsInfo.udf_productTypeExists('Chiller') = 0
 		BEGIN
 			insert into ProductsInfo.ProductType(ProTypName) values('Chiller')
 		END
 		
 		IF @IsChillerStock = 0
 		begin
-			set @ProductTypeID = ProductsInfo.productTypeExists('Dry')
+			set @ProductTypeID = ProductsInfo.udf_productTypeExists('Dry')
 		end
 		else
 		begin
-			set @ProductTypeID = ProductsInfo.productTypeExists('Chiller')
+			set @ProductTypeID = ProductsInfo.udf_productTypeExists('Chiller')
 		end
 
 		--Tax Rate
-		IF ProductsInfo.taxRateExists (@TaxRate) = 0
+		IF ProductsInfo.udf_taxRateExists (@TaxRate) = 0
 		BEGIN
 			insert into ProductsInfo.TaxRate(TaxRatTaxRate) values(@TaxRate)
 		END
+		ELSE
+		BEGIN
+			print 'Esta tax rate já existe - Migrate_OldData_ItemStockTable'
+		END
 
-		set @TaxRateID = ProductsInfo.taxRateExists(@TaxRate)
+		set @TaxRateID = ProductsInfo.udf_taxRateExists(@TaxRate)
 		
 		--Product
-		IF ProductsInfo.productExists(@StockItem) = 0
+		IF ProductsInfo.udf_productExists(@StockItem) = 0
 		BEGIN
 			insert into ProductsInfo.Product(ProdBrandId,
 			ProdTaxRateId,
@@ -949,9 +1024,13 @@ BEGIN
 			@TypicalWeightPerUnit
 			)
 		END
+		ELSE
+		BEGIN
+			print 'Este produto já existe - Migrate_OldData_ItemStockTable'
+		END
 
 		--Promotion
-		IF ProductsInfo.promotionExists (1) = 0
+		IF ProductsInfo.udf_promotionExists (1) = 0
 		BEGIN
 			SET IDENTITY_INSERT ProductsInfo.Promotion ON
 			insert into ProductsInfo.Promotion(PromId, PromDescription, PromStartDate, PromEndDate) values(1, 'No Promotion', GETDATE(), CAST('2032-08-25' AS date))
@@ -959,7 +1038,7 @@ BEGIN
 		END
 
 		--Product Promotion
-		IF ProductsInfo.productPromotionExists (@StockItem, 1) = 0
+		IF ProductsInfo.udf_productPromotionExists (@StockItem, 1) = 0
 		BEGIN
 			declare @productID int
 
@@ -968,6 +1047,10 @@ BEGIN
 			SET IDENTITY_INSERT ProductsInfo.Promotion ON
 			insert into ProductsInfo.Product_Promotion(Prod_PromProductId, Prod_PromPromotionId, ProdNewPrice) values(@productID, 1, 0)
 			SET IDENTITY_INSERT ProductsInfo.Promotion OFF
+		END
+		ELSE
+		BEGIN
+			print 'Este relação entre a promoção e o produto já existe - Migrate_OldData_ItemStockTable'
 		END
 
 		FETCH NEXT FROM productCursor INTO
@@ -992,7 +1075,7 @@ END;
 GO
 
 --Procedimento que importa os dados da tabela OldData.Sale para as novas tabelas SalesInfo.Sale e SalesInfo.ProductPromotion_Sale
-CREATE OR ALTER PROCEDURE Migrate_OldData_SaleTable
+CREATE OR ALTER PROCEDURE sp_Migrate_OldData_SaleTable
 AS
 BEGIN
 	DECLARE saleCursor CURSOR  
@@ -1082,6 +1165,10 @@ BEGIN
 			0)
 			SET IDENTITY_INSERT SalesInfo.Sale OFF
 		END
+		ELSE
+		BEGIN
+			print 'Esta venda já existe - Migrate_OldData_SaleTable'
+		END
 		
 		set @saleID = SalesInfo.vendaExists (@WWIInvoiceID)
 		
@@ -1089,6 +1176,10 @@ BEGIN
 		IF SalesInfo.productPromotion_VendaExists (@saleID, @productPromotionID) = 0
 		BEGIN
 			insert into SalesInfo.productPromotion_Sale (ProdProm_SalProductPromotionId, ProdProm_SalSaleId, ProdProm_SalQuantity) values(@productPromotionID, @saleID, @Quantity)
+		END
+		ELSE
+		BEGIN
+			print 'Este relação entre a relação do produto com a promoção e a venda já existe - Migrate_OldData_SaleTable'
 		END
 
 		update SalesInfo.Sale
@@ -1115,17 +1206,26 @@ END;
 GO
 
 --Procedimento que importa os dados das tabelas OldData.Tabela para as novas tabelas SalesInfo.Tabela
-CREATE OR ALTER PROCEDURE MigrateAll
+CREATE OR ALTER PROCEDURE sp_MigrateAll
 AS
 BEGIN
 	print 'Importar' 
-	Exec Migrate_OldData_CityTable
-	Exec Migrate_OldData_StatesTable
-	Exec Migrate_OldData_lookupTable
-	Exec Migrate_OldData_CustomerTable
-	Exec Migrate_OldData_EmployeeTable
-	Exec Migrate_OldData_ItemStockTable
-	Exec Migrate_OldData_SaleTable
+	Exec sp_Migrate_OldData_CityTable
+	Exec sp_Migrate_OldData_StatesTable
+	Exec sp_Migrate_OldData_lookupTable
+	Exec sp_Migrate_OldData_CustomerTable
+	Exec sp_Migrate_OldData_EmployeeTable
+	Exec sp_Migrate_OldData_ItemStockTable
+	Exec sp_Migrate_OldData_SaleTable
+
+	/*DROP SCHEMA OldData;
+	DROP TABLE OldData.City
+	DROP TABLE OldData.Customer
+	DROP TABLE OldData.Employee
+	DROP TABLE OldData.lookup
+	DROP TABLE OldData.Sale
+	DROP TABLE OldData.States
+	DROP TABLE OldData.[Stock Item]*/
 END;
 GO
 Exec MigrateAll;

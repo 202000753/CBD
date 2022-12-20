@@ -1,80 +1,40 @@
  /********************************************
- *	UC: Complementos de Bases de Dados 2022/2023
- *
- *	Projeto - Queries das tabelas da base de dados nova
- *		Nuno Reis (202000753)
- *		Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
- *
- ********************************************/
+*	UC: Complementos de Bases de Dados 2022/2023
+*
+*	Projeto - Queries das tabelas da base de dados nova
+*		Nuno Reis (202000753)
+*		Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
+*
+********************************************/
  USE WWIGlobal
- 
- --City
-select *
-from OldData.City;
 
---Customer
-select *
-from OldData.Customer;
-
---Employee
-select *
-from OldData.Employee;
-
---Sale
-select *
-from OldData.Sale;
-
-select distinct [WWI Invoice ID]
-from OldData.Sale
-order by [WWI Invoice ID];
-
---Stock Item
-select *
-from OldData.[Stock Item];
-
---States
-select *
-from OldData.States;
-
---lookup
-select *
-from OldData.lookup;
-
- /********************************************
- *	Tabelas novas
- ********************************************/
 select *
 from UsersInfo.Country;
 
 select *
-from UsersInfo.City;
+from UsersInfo.City
+order by CitName;
 
 select *
-from UsersInfo.StateProvince;
+from UsersInfo.StateProvince
+order by StaProName;
 
 select *
-from UsersInfo.Category;
+from UsersInfo.Category
+order by CatName;
 
 select *
 from UsersInfo.BuyingGroup;
 
 select *
-from UsersInfo.SysUser;
-
-select *
-from UsersInfo.ErrorLog;
-
-select *
-from UsersInfo.Token;
-
-select *
-from UsersInfo.Region_Category;
-
-select *
 from UsersInfo.Customer;
 
 select *
-from UsersInfo.Employee;
+from UsersInfo.Employee
+order by EmpPreferedName;
+
+select *
+from UsersInfo.SysUser;
 
 select *
 from ProductsInfo.Package;
@@ -89,20 +49,30 @@ select *
 from ProductsInfo.TaxRate;
 
 select *
-from ProductsInfo.Product;
+from ProductsInfo.Product
+order by ProdName;
 
 select *
 from ProductsInfo.Promotion;
 
 select *
-from ProductsInfo.Product_Promotion;
+from SalesInfo.Sale;
 
 select *
-from SalesInfo.Sale;
+from ProductsInfo.Product_Promotion;
 
 select *
 from SalesInfo.ProductPromotion_Sale
 order by ProdProm_SalSaleId;
+
+select *
+from UsersInfo.Region_Category;
+
+select *
+from UsersInfo.ErrorLog;
+
+select *
+from UsersInfo.Token;
 
 /********************************************
  *	Queries de verificação de conformidade
@@ -161,14 +131,8 @@ order by p.ProdName, year(s.SalDeliveryDate);
 -- Total monetário de vendas por ano por “City”
 -- Valor monetário obtido por quantity*Unit Price
 -- O ano deve ser retirado da coluna “Delivery Date Key”
-select ci.CitName as 'Cidade', year(s.SalDeliveryDate) as 'Ano', sum(pps.ProdProm_SalQuantity * p.ProdUnitPrice) as 'Total monetario'
-from SalesInfo.Sale s 
-join SalesInfo.ProductPromotion_Sale pps
-on s.SalID = pps.ProdProm_SalSaleId
-join ProductsInfo.Product_Promotion pp
-on pp.Prod_PromProductPromotionId = pps.ProdProm_SalProductPromotionId
-join ProductsInfo.Product p
-on p.ProdId = pp.Prod_PromProductId
+select ci.CitName as 'Cidade', year(s.SalDeliveryDate) as 'Ano', sum(s.SalTotalPrice) as 'Total monetario'
+from SalesInfo.Sale s
 join UsersInfo.Customer cu
 on s.SalCustomerId = cu.CusUserId
 join UsersInfo.Region_Category rc
@@ -177,3 +141,38 @@ join UsersInfo.City ci
 on rc.Reg_CatCityId = ci.CitId
 group by ci.CitName, year(s.SalDeliveryDate)
 order by ci.CitName, year(s.SalDeliveryDate);
+
+/********************************************
+ ********************************************/
+select *
+from RH.ErrorLog;
+
+select *
+from RH.Country;
+
+select *
+from RH.StateProvince;
+
+select *
+from RH.City;
+
+select *
+from RH.Category;
+
+select *
+from RH.Region_Category;
+
+select *
+from RH.BuyingGroup;
+
+select *
+from RH.SysUser;
+
+select *
+from RH.Customer;
+
+select *
+from RH.Employee;
+
+select *
+from RH.Token;

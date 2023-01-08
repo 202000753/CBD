@@ -35,7 +35,6 @@ select *
 from dbo.lookup
 order by name;
 
-
 --Customer
 select distinct Category
 from dbo.Customer

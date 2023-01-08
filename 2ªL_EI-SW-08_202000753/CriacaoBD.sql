@@ -187,7 +187,7 @@ GO
 --DROP TABLE Storage.Promotion;
 CREATE TABLE Storage.Promotion (
 	PromId INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	PromDescription VARCHAR(100),
+	PromDescription VARCHAR(100) NOT NULL,
 	PromStartDate DATE NOT NULL,
 	PromEndDate DATE NOT NULL
 );
@@ -198,7 +198,7 @@ CREATE TABLE Storage.Product_Promotion (
 	Prod_PromProductPromotionId INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	Prod_PromProductId INT  NOT NULL foreign key references Storage.Product (ProdId),
 	Prod_PromPromotionId INT NOT NULL foreign key references Storage.Promotion (PromId),
-	ProdNewPrice FLOAT NOT NULL
+	ProdNewPrice FLOAT
 );
 GO
 
@@ -231,7 +231,6 @@ GO
 CREATE TABLE RH.Token (
 	TokId INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
     TokUserId INT NOT NULL FOREIGN KEY REFERENCES RH.SysUser(SysUseId),
-    TokMail VARCHAR(30) NOT NULL,
 	TokDateTime DATETIME NOT NULL,
 	TokEndDateTime DATETIME NOT NULL,
 	TokToken INT UNIQUE NOT NULL

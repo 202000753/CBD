@@ -35,6 +35,7 @@ AS
 	else
 	begin
 		set @error = 'RH.country_insert -> Já existe um pais com este nome e continente (' + @countryName + ', ' + @continentName + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -59,6 +60,7 @@ AS
 	else
 	begin
 		set @error = 'RH.country_update -> Não existe nenhum pais com este id (' + cast(@countryId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -83,6 +85,7 @@ AS
 	else
 	begin
 		set @error = 'RH.country_delete -> Não existe nenhum pais com este id (' + cast(@countryId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -109,6 +112,7 @@ AS
 	else
 	begin
 		set @error = 'RH.stateProvince_insert -> Já existe um estado com este nome (' + @stateProvinceName + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -133,6 +137,7 @@ AS
 	else
 	begin
 		set @error = 'RH.stateProvince_update -> Não existe nenhum estado com este id (' + cast(@stateProvinceId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -157,6 +162,7 @@ AS
 	else
 	begin
 		set @error = 'RH.stateProvince_delete -> Não existe nenhum estado com este id (' + cast(@stateProvinceId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -183,6 +189,7 @@ AS
 	else
 	begin
 		set @error = 'RH.city_insert -> Já existe uma cidade com este nome (' + @cityName + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -207,6 +214,7 @@ AS
 	else
 	begin
 		set @error = 'RH.city_update -> Não existe nenhuma cidade com este id (' + cast(@cityId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -231,6 +239,7 @@ AS
 	else
 	begin
 		set @error = 'RH.city_delete -> Não existe nenhuma cidade com este id (' + cast(@cityId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -257,6 +266,7 @@ AS
 	else
 	begin
 		set @error = 'RH.category_insert -> Já existe uma categoria com este nome (' + @categoryName + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -281,6 +291,7 @@ AS
 	else
 	begin
 		set @error = 'RH.category_update -> Não existe nenhuma categoria com este id (' + cast(@categoryId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -305,6 +316,7 @@ AS
 	else
 	begin
 		set @error = 'RH.category_delete -> Não existe nenhuma categoria com este id (' + cast(@categoryId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -341,30 +353,35 @@ AS
 		if @regionCategoryExistsID != 0
 		begin
 			set @error = 'RH.regionCategory_insert -> Já existe uma relação entre este pais, estado, cidade e categoria (' + cast(@countryId as varchar(10)) + ', ' + cast(@stateProvinceId as varchar(10)) + ', ' + cast(@cityId as varchar(10)) + ', ' + cast(@categoryId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 
 		if @countryExistsId = 0
 		begin
 			set @error = 'RH.regionCategory_insert -> Não existe nenhum pais com este id (' + cast(@countryId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 
 		if @stateProvinceExistsId = 0
 		begin
 			set @error = 'RH.regionCategory_insert -> Não existe nenhum estado com este id (' + cast(@stateProvinceId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 
 		if @cityExistsId = 0
 		begin
 			set @error = 'RH.regionCategory_insert -> Não existe nenhuma cidade com este id (' + cast(@cityId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 
 		if @categoryExistsId = 0
 		begin
 			set @error = 'RH.regionCategory_insert -> Não existe nenhuma categoria com este id (' + cast(@categoryId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 	end
@@ -400,30 +417,35 @@ AS
 		if @regionCategoryExistsID = 0
 		begin
 			set @error = 'RH.regionCategory_update -> Não existe nenhuma relação entre este pais, estado, cidade e categoria com este id (' + cast(@regionCategoryId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 
 		if @countryExistsId = 0
 		begin
 			set @error = 'RH.regionCategory_insert -> Não existe nenhum pais com este id (' + cast(@countryId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 
 		if @stateProvinceExistsId = 0
 		begin
 			set @error = 'RH.regionCategory_insert -> Não existe nenhum estado com este id (' + cast(@stateProvinceId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 
 		if @cityExistsId = 0
 		begin
 			set @error = 'RH.regionCategory_insert -> Não existe nenhuma cidade com este id (' + cast(@cityId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 
 		if @categoryExistsId = 0
 		begin
 			set @error = 'RH.regionCategory_insert -> Não existe nenhuma categoria com este id (' + cast(@categoryId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 	end
@@ -449,6 +471,7 @@ AS
 	else
 	begin
 		set @error = 'RH.regionCategory_delete -> Não existe nenhuma relação entre este pais, estado, cidade e categoria com este id (' + cast(@regionCategoryId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -475,6 +498,7 @@ AS
 	else
 	begin
 		set @error = 'RH.buiyngGroup_insert -> Já existe um grupo com este nome (' + @buiyngGroupName + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -499,6 +523,7 @@ AS
 	else
 	begin
 		set @error = 'RH.buiyngGroup_update -> Não existe nenhum grupo com este id (' + cast(@buiyngGroupId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -523,6 +548,7 @@ AS
 	else
 	begin
 		set @error = 'RH.buiyngGroup_delete -> Não existe nenhum grupo com este id (' + cast(@buiyngGroupId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -549,6 +575,7 @@ AS
 	else
 	begin
 		set @error = 'RH.sysUser_insert -> Já existe um utilizador com este email (' + @sysUserEmail + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -576,6 +603,7 @@ AS
 	else
 	begin
 		set @error = 'RH.sysUser_update -> Não existe nenhum utilizador com este id (' + cast(@sysUserId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -600,6 +628,7 @@ AS
 	else
 	begin
 		set @error = 'RH.sysUser_delete -> Não existe nenhum utilizador com este id (' + cast(@sysUserId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -618,15 +647,17 @@ AS
 		@userExistsId int,
 		@headquartersExistsId int,
 		@regionCategoryExistsId int,
-		@buyingGroupExistsId int
+		@buyingGroupExistsId int,
+		@employeeExistsID int
 
 	set @customerExistsID = RH.udf_customerExistsById(@userId)
 	set @userExistsId = RH.udf_sysUserExistsById(@userId)
 	set @headquartersExistsId = RH.udf_customerExistsById(@headquartersId)
 	set @regionCategoryExistsId = RH.udf_regionCategoryExistsById(@regionCategoryId)
 	set @buyingGroupExistsId = RH.udf_buiyngGroupExistsById(@buyingGroupId)
+	set @employeeExistsID = RH.udf_employeeExistsById(@userId)
 
-	if @customerExistsID = 0 and @userExistsId != 0 and @headquartersExistsId != 0 and @regionCategoryExistsId != 0 and @buyingGroupExistsId != 0
+	if @customerExistsID = 0 and @userExistsId != 0 and @headquartersExistsId != 0 and @regionCategoryExistsId != 0 and @buyingGroupExistsId != 0 and @employeeExistsID = 0
 	begin
 		insert into RH.Customer values(@userId, @headquartersId, @regionCategoryId, @buyingGroupId, @primaryContact)
 	end
@@ -634,37 +665,47 @@ AS
 	begin
 		if @customerExistsID != 0
 		begin
-			set @error = 'RH.customer_insert -> Já existe um cliente com este id de utilizador (' + @userId + ')'
+			set @error = 'RH.customer_insert -> Já existe um cliente com este id de utilizador (' + cast(@userId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 		
 		if @userExistsId = 0
 		begin
 			set @error = 'RH.customer_insert -> Não existe nenhum utilizador com este id (' + cast(@userId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 		
 		if @headquartersExistsId = 0
 		begin
 			set @error = 'RH.customer_insert -> Não existe nenhum cliente com este id (' + cast(@headquartersId as varchar(10)) + ') - headquarters'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 		
 		if @regionCategoryExistsId = 0
 		begin
 			set @error = 'RH.customer_insert -> Não existe nenhuma relação entre este pais, estado, cidade e categoria com este id (' + cast(@regionCategoryId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 		
 		if @buyingGroupExistsId = 0
 		begin
 			set @error = 'RH.customer_insert -> Não existe nenhum grupo com este id (' + cast(@buyingGroupId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @employeeExistsID != 0
+		begin
+			set @error = 'RH.customer_insert -> O utilizador com este id é um funcionario (' + cast(@userId as varchar(10)) + ', ' + cast(@employeeExistsID as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 	end
 GO
-insert into RH.Customer values(1, 1, 1, 1, 'João Sousa')
-go
 EXEC RH.customer_insert 2, 1, 1, 1, 'João Sousa';
 --EXEC RH.customer_insert 5, 1, 3, 3, 'Nuno Reis';
 --EXEC RH.customer_insert 7, 1, 1, 1, 'Nuno Reis';
@@ -678,18 +719,20 @@ AS
 		@userExistsId int,
 		@headquartersExistsId int,
 		@regionCategoryExistsId int,
-		@buyingGroupExistsId int
+		@buyingGroupExistsId int,
+		@employeeExistsID int
 
 	set @customerExistsID = RH.udf_customerExistsById(@userId)
 	set @userExistsId = RH.udf_sysUserExistsById(@userId)
 	set @headquartersExistsId = RH.udf_customerExistsById(@headquartersId)
 	set @regionCategoryExistsId = RH.udf_regionCategoryExistsById(@regionCategoryId)
 	set @buyingGroupExistsId = RH.udf_buiyngGroupExistsById(@buyingGroupId)
+	set @employeeExistsID = RH.udf_employeeExistsById(@userId)
 
-	if @customerExistsID != 0 and @userExistsId != 0 and @headquartersExistsId != 0 and @regionCategoryExistsId != 0 and @buyingGroupExistsId != 0
+	if @customerExistsID != 0 and @userExistsId != 0 and @headquartersExistsId != 0 and @regionCategoryExistsId != 0 and @buyingGroupExistsId != 0 and @employeeExistsID != 0
 	begin
 		update RH.Customer
-		set CusUserId = @userId, CusHeadquartersId = @headquartersId, CusRegion_CategoryId = @regionCategoryId, CusBuyingGroupId = @buyingGroupId, CusPrimaryContact = @primaryContact
+		set CusHeadquartersId = @headquartersId, CusRegion_CategoryId = @regionCategoryId, CusBuyingGroupId = @buyingGroupId, CusPrimaryContact = @primaryContact
 		where CusUserId = @userId
 	end
 	else
@@ -697,30 +740,42 @@ AS
 		if @customerExistsID = 0
 		begin
 			set @error = 'RH.customer_update -> Não existe nenhum cliente com este id (' + cast(@userId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 		
 		if @userExistsId = 0
 		begin
 			set @error = 'RH.customer_update -> Não existe nenhum utilizador com este id (' + cast(@userId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 		
 		if @headquartersExistsId = 0
 		begin
 			set @error = 'RH.customer_update -> Não existe nenhum cliente com este id (' + cast(@headquartersId as varchar(10)) + ') - headquarters'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 		
 		if @regionCategoryExistsId = 0
 		begin
 			set @error = 'RH.customer_update -> Não existe nenhuma relação entre este pais, estado, cidade e categoria com este id (' + cast(@regionCategoryId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 		
 		if @buyingGroupExistsId = 0
 		begin
 			set @error = 'RH.customer_update -> Não existe nenhum grupo com este id (' + cast(@buyingGroupId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @employeeExistsID != 0
+		begin
+			set @error = 'RH.customer_update -> O utilizador com este id é um funcionario (' + cast(@userId as varchar(10)) + ', ' + cast(@employeeExistsID as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 	end
@@ -746,6 +801,7 @@ AS
 	else
 	begin
 		set @error = 'RH.customer_delete -> Não existe nenhum cliente com este id (' + cast(@userId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
 		EXEC RH.errorLog_insert @error
 	end
 GO
@@ -756,3 +812,1156 @@ GO
 /********************************************
 * Employee
 ********************************************/
+CREATE OR ALTER PROCEDURE RH.employee_insert @userId int, @employeePreferedName VARCHAR(10), @employeeIsSalesPerson BIT
+AS
+	declare
+		@error varchar(300),
+		@employeeExistsID int,
+		@customerExistsID int
+
+	set @employeeExistsID = RH.udf_employeeExistsById(@userId)
+	set @customerExistsID = RH.udf_customerExistsById(@userId)
+
+	if @employeeExistsID = 0 and @customerExistsID = 0
+	begin
+		insert into RH.Employee values(@userId, @employeePreferedName, @employeeIsSalesPerson)
+	end
+	else
+	begin
+		if @employeeExistsID != 0
+		begin
+			set @error = 'RH.employee_insert -> Já existe um funcionario com este id de utilizador (' + cast(@userId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @customerExistsID != 0
+		begin
+			set @error = 'RH.employee_insert -> O utilizador com este id é um cliente (' + cast(@userId as varchar(10)) + ', ' + cast(@customerExistsID as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+GO
+EXEC RH.employee_insert 3, 'Nuno', 1;
+--EXEC RH.employee_insert 6, 'Eva', 1;
+GO
+
+CREATE OR ALTER PROCEDURE RH.employee_update @userId int, @employeePreferedName VARCHAR(10), @employeeIsSalesPerson BIT
+AS
+	declare
+		@error varchar(300),
+		@employeeExistsID int,
+		@customerExistsID int
+
+	set @employeeExistsID = RH.udf_employeeExistsById(@userId)
+	set @customerExistsID = RH.udf_customerExistsById(@userId)
+
+	if @employeeExistsID != 0 and @customerExistsID = 0
+	begin
+		update RH.Employee
+		set EmpPreferedName = @employeePreferedName, EmpIsSalesPerson = @employeeIsSalesPerson
+		where EmpUserId = @userId
+	end
+	else
+	begin
+		if @employeeExistsID = 0
+		begin
+			set @error = 'RH.employee_update -> Não existe nenhum funcionario com este id (' + cast(@userId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @customerExistsID != 0
+		begin
+			set @error = 'RH.employee_update -> O utilizador com este id é um cliente (' + cast(@userId as varchar(10)) + ', ' + cast(@customerExistsID as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+GO
+--EXEC RH.employee_update 7, 'Eva', 1;
+--EXEC RH.employee_update 6, 'Eva', 0;
+--EXEC RH.employee_update 6, 'Eva', 1;
+GO
+
+CREATE OR ALTER PROCEDURE RH.employee_delete @userId int
+AS
+	declare
+		@error varchar(300),
+		@employeeExistsID int
+
+	set @employeeExistsID = RH.udf_employeeExistsById(@userId)
+
+	if @employeeExistsID != 0
+	begin
+		delete from RH.Employee
+		where EmpUserId = @userId
+	end
+	else
+	begin
+		set @error = 'RH.employee_delete -> Não existe nenhum funcionario com este id (' + cast(@userId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC RH.employee_delete 6;
+--EXEC RH.employee_delete 7;
+GO
+
+/********************************************
+* Token
+********************************************/
+CREATE OR ALTER PROCEDURE RH.token_insert @tokenUserId INT
+AS
+	declare
+		@error varchar(300),
+		@token int,
+		@tokenDateTime datetime,
+		@tokenEndDateTime datetime,
+		@userExistsID int,
+		@tokenExistsID int
+
+	set @userExistsID = RH.udf_sysUserExistsById(@tokenUserId)
+
+	set @token = CAST(RAND() * 1000000 AS INT)
+
+	set @tokenExistsID = RH.udf_tokenExists(@token)
+
+	if @tokenExistsID = 0 and @userExistsID != 0
+	begin
+		set @tokenDateTime = GETDATE()
+		set @tokenEndDateTime = DATEADD(day, +1, GETDATE())
+		insert into RH.Token values(@tokenUserId, @tokenDateTime, @tokenEndDateTime, @token)
+	end
+	else
+	begin
+		if @tokenExistsID != 0
+		begin
+			set @error = 'RH.token_insert -> Já existe um token com este token (' + cast(@token as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @userExistsID = 0
+		begin
+			set @error = 'RH.token_insert -> Não existe nenhum cliente com este id (' + cast(@tokenUserId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+GO
+EXEC RH.token_insert 3;
+--EXEC RH.token_insert 6;
+GO
+
+CREATE OR ALTER PROCEDURE RH.token_update @tokenId int
+AS
+	declare
+		@error varchar(300),
+		@tokenExistsID int
+		
+	set @tokenExistsID = RH.udf_tokenExistsById(@tokenId)
+
+	if @tokenExistsID != 0
+	begin
+		update RH.Token
+		set TokEndDateTime = GETDATE()
+		where TokId = @tokenId
+	end
+	else
+	begin
+		set @error = 'RH.token_update -> Não existe nenhum token com este id (' + cast(@tokenExistsID as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC RH.token_update 3;
+--EXEC RH.token_update 2;
+GO
+
+/********************************************
+* Tax Rate
+********************************************/
+CREATE OR ALTER PROCEDURE Storage.taxRate_insert @taxRate float
+AS
+	declare
+		@error varchar(300),
+		@taxRateExistsID int
+
+	set @taxRateExistsID = Storage.udf_taxRateExists(@taxRate)
+
+
+	if @taxRateExistsID = 0
+	begin
+		insert into Storage.TaxRate values(@taxRate)
+	end
+	else
+	begin
+		set @error = 'Storage.taxRate_insert -> Já existe uma taxa com este valor (' + cast(@taxRate as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+EXEC Storage.taxRate_insert 3.2;
+--EXEC Storage.taxRate_insert 2.2;
+GO
+
+CREATE OR ALTER PROCEDURE Storage.taxRate_update @taxRateId int, @taxRate float
+AS
+	declare
+		@error varchar(300),
+		@taxRateExistsID int
+
+	set @taxRateExistsID = Storage.udf_taxRateExistsById(@taxRateId)
+
+	if @taxRateExistsID != 0
+	begin
+		update Storage.TaxRate
+		set TaxRatTaxRate = @taxRate
+		where TaxRatId = @taxRateId
+	end
+	else
+	begin
+		set @error = 'Storage.taxRate_update -> Não existe nenhuma taxa com este id (' + cast(@taxRateId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC Storage.taxRate_update 2, 2.7;
+--EXEC Storage.taxRate_update 2, 2.2;
+--EXEC Storage.taxRate_update 3, 2.2;
+GO
+
+CREATE OR ALTER PROCEDURE Storage.taxRate_delete @taxRateId int
+AS
+	declare
+		@error varchar(300),
+		@taxRateExistsID int
+
+	set @taxRateExistsID = Storage.udf_taxRateExistsById(@taxRateId)
+
+	if @taxRateExistsID != 0
+	begin
+		delete from Storage.TaxRate
+		where TaxRatId = @taxRateId
+	end
+	else
+	begin
+		set @error = 'Storage.taxRate_delete -> Não existe nenhuma taxa com este id (' + cast(@taxRateId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC Storage.taxRate_delete 2;
+--EXEC Storage.taxRate_delete 3;
+GO
+
+/********************************************
+* Product Type
+********************************************/
+CREATE OR ALTER PROCEDURE Storage.productType_insert @productType VARCHAR(25)
+AS
+	declare
+		@error varchar(300),
+		@productTypeExistsID int
+
+	set @productTypeExistsID = Storage.udf_productTypeExists(@productType)
+
+
+	if @productTypeExistsID = 0
+	begin
+		insert into Storage.ProductType values(@productType)
+	end
+	else
+	begin
+		set @error = 'Storage.productType_insert -> Já existe um tipo de produto com este nome (' + @productType + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+EXEC Storage.productType_insert 'Seco';
+--EXEC Storage.productType_insert 'Chiller';
+GO
+
+CREATE OR ALTER PROCEDURE Storage.productType_update @productTypeId int, @productType VARCHAR(25)
+AS
+	declare
+		@error varchar(300),
+		@productTypeExistsID int
+
+	set @productTypeExistsID = Storage.udf_productTypeExistsById(@productTypeId)
+
+	if @productTypeExistsID != 0
+	begin
+		update Storage.ProductType
+		set ProTypName = @productType
+		where ProTypId = @productTypeId
+	end
+	else
+	begin
+		set @error = 'Storage.productType_update -> Não existe nenhum tipo de produto com este id (' + cast(@productTypeId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC Storage.productType_update 2, 'Dry';
+--EXEC Storage.productType_update 2, 'Chiller';
+--EXEC Storage.productType_update 3, 'Chiller';
+GO
+
+CREATE OR ALTER PROCEDURE Storage.productType_delete @productTypeId int
+AS
+	declare
+		@error varchar(300),
+		@productTypeExistsID int
+
+	set @productTypeExistsID = Storage.udf_productTypeExistsById(@productTypeId)
+
+	if @productTypeExistsID != 0
+	begin
+		delete from Storage.ProductType
+		where ProTypId = @productTypeId
+	end
+	else
+	begin
+		set @error = 'Storage.productType_delete -> Não existe nenhum tipo de produto com este id (' + cast(@productTypeId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC Storage.productType_delete 2;
+--EXEC Storage.productType_delete 1;
+GO
+
+/********************************************
+* Package
+********************************************/
+CREATE OR ALTER PROCEDURE Storage.package_insert @package VARCHAR(25)
+AS
+	declare
+		@error varchar(300),
+		@packageExistsID int
+
+	set @packageExistsID = Storage.udf_packageExists(@package)
+
+
+	if @packageExistsID = 0
+	begin
+		insert into Storage.Package values(@package)
+	end
+	else
+	begin
+		set @error = 'Storage.package_insert -> Já existe um pacote com este nome (' + @package + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+EXEC Storage.package_insert 'Pacote';
+--EXEC Storage.package_insert 'Bag';
+GO
+
+CREATE OR ALTER PROCEDURE Storage.package_update @packageId int, @package VARCHAR(25)
+AS
+	declare
+		@error varchar(300),
+		@packageExistsID int
+
+	set @packageExistsID = Storage.udf_packageExistsById(@packageId)
+
+	if @packageExistsID != 0
+	begin
+		update Storage.Package
+		set PacPackage = @package
+		where PacId = @packageId
+	end
+	else
+	begin
+		set @error = 'Storage.package_update -> Não existe nenhum pacote com este id (' + cast(@packageId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC Storage.package_update 2, 'Packet';
+--EXEC Storage.package_update 2, 'Bag';
+--EXEC Storage.package_update 3, 'Bag';
+GO
+
+CREATE OR ALTER PROCEDURE Storage.package_delete @packageId int
+AS
+	declare
+		@error varchar(300),
+		@packageExistsID int
+
+	set @packageExistsID = Storage.udf_packageExistsById(@packageId)
+
+	if @packageExistsID != 0
+	begin
+		delete from Storage.Package
+		where PacId = @packageId
+	end
+	else
+	begin
+		set @error = 'Storage.package_delete -> Não existe nenhum pacote com este id (' + cast(@packageId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC Storage.package_delete 2;
+--EXEC Storage.package_delete 3;
+GO
+
+/********************************************
+* Brand
+********************************************/
+CREATE OR ALTER PROCEDURE Storage.brand_insert @brand VARCHAR(25)
+AS
+	declare
+		@error varchar(300),
+		@brandExistsID int
+
+	set @brandExistsID = Storage.udf_brandExists(@brand)
+
+
+	if @brandExistsID = 0
+	begin
+		insert into Storage.Brand values(@brand)
+	end
+	else
+	begin
+		set @error = 'Storage.brand_insert -> Já existe uma marca com este nome (' + @brand + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+EXEC Storage.brand_insert 'Nike';
+--EXEC Storage.brand_insert 'Northwind';
+GO
+
+CREATE OR ALTER PROCEDURE Storage.brand_update @brandId int, @brand VARCHAR(25)
+AS
+	declare
+		@error varchar(300),
+		@brandExistsID int
+
+	set @brandExistsID = Storage.udf_brandExistsById(@brandId)
+
+	if @brandExistsID != 0
+	begin
+		update Storage.Brand
+		set BraName = @brand
+		where BraId = @brandId
+	end
+	else
+	begin
+		set @error = 'Storage.brand_update -> Não existe nenhuma marca com este id (' + cast(@brandId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC Storage.brand_update 2, 'N/A';
+--EXEC Storage.brand_update 2, 'Northwind';
+--EXEC Storage.brand_update 3, 'Northwind';
+GO
+
+CREATE OR ALTER PROCEDURE Storage.brand_delete @brandId int
+AS
+	declare
+		@error varchar(300),
+		@brandExistsID int
+		
+	set @brandExistsID = Storage.udf_brandExistsById(@brandId)
+
+	if @brandExistsID != 0
+	begin
+		delete from Storage.Brand
+		where BraId = @brandId
+	end
+	else
+	begin
+		set @error = 'Storage.brand_delete -> Não existe nenhuma marca com este id (' + cast(@brandId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC Storage.brand_delete 2;
+--EXEC Storage.brand_delete 3;
+GO
+
+/********************************************
+* Product
+********************************************/
+CREATE OR ALTER PROCEDURE Storage.product_insert @brandId int, @taxRateId int, @productTypeId int, @buyingPackageId int, @sellingPackageId int, @productName varchar(100), @productColor varchar(50), @productSize varchar(20), @productLeadTimeDays int, @productQuantityPerOuter int, @productStock int, @productBarCode varchar(20), @productUnitPrice float, @productRecommendedRetailPrice float, @productTypicalWeightPerUnit float
+AS
+	declare
+		@error varchar(300),
+		@productExistsID int,
+		@brandExistsId int, 
+		@taxRateExistsId int, 
+		@productTypeExistsId int, 
+		@buyingPackageExistsId int, 
+		@sellingPackageExistsId int
+
+	set @productExistsID = Storage.udf_productExists(@productName)
+	set @brandExistsId = Storage.udf_brandExistsById(@brandId)
+	set @taxRateExistsId = Storage.udf_taxRateExistsById(@taxRateId) 
+	set @productTypeExistsId = Storage.udf_productTypeExistsById(@productTypeId)
+	set @buyingPackageExistsId = Storage.udf_packageExistsById(@buyingPackageId)
+	set @sellingPackageExistsId = Storage.udf_packageExistsById(@sellingPackageId)
+
+
+	if @productExistsID = 0 and @brandExistsId != 0 and @taxRateExistsId != 0 and @productTypeExistsId != 0 and @buyingPackageExistsId != 0 and @sellingPackageExistsId != 0
+	begin
+		insert into Storage.Product values(@brandId, @taxRateId, @productTypeId, @buyingPackageId, @sellingPackageId, @productName, @productColor, @productSize, @productLeadTimeDays, @productQuantityPerOuter, @productStock, @productBarCode, @productUnitPrice, @productRecommendedRetailPrice, @productTypicalWeightPerUnit)
+	end
+	else
+	begin
+		if @productExistsID != 0
+		begin
+			set @error = 'Storage.product_insert -> Já existe um produto com este nome (' + @productName + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+
+		if @brandExistsId = 0
+		begin
+			set @error = 'Storage.product_insert -> Não existe nenhuma marca com este id (' + cast(@brandId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+
+		if @taxRateExistsId = 0
+		begin
+			set @error = 'Storage.product_insert -> Não existe nenhuma taxa com este id (' + cast(@taxRateId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+
+		if @productTypeExistsId = 0
+		begin
+			set @error = 'Storage.product_insert -> Não existe nenhum tipo de produto com este id (' + cast(@productTypeId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+
+		if @buyingPackageExistsId = 0
+		begin
+			set @error = 'Storage.product_insert -> Não existe nenhum pacote com este id (Buying Package - ' + cast(@buyingPackageId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+
+		if @sellingPackageExistsId = 0
+		begin
+			set @error = 'Storage.product_insert -> Não existe nenhum pacote com este id (Selling Package - ' + cast(@sellingPackageId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+GO
+EXEC Storage.product_insert 1, 1, 5, 1, 1, 'Tenís AirForce', 'Preto', '46', 7, 12, 30, 'N/A', 18.00, 26.91, 0.400;
+--EXEC Storage.product_insert 3, 3, 4, 3, 3, '"The Gu" red shirt XML tag t-shirt (Black) 3XL', 'Black', '3XL', 7, 12, 30, 'N/A', 18.00, 26.91, 0.400;
+GO
+
+CREATE OR ALTER PROCEDURE Storage.product_update @productId int, @brandId int, @taxRateId int, @productTypeId int, @buyingPackageId int, @sellingPackageId int, @productName varchar(100), @productColor varchar(50), @productSize varchar(20), @productLeadTimeDays int, @productQuantityPerOuter int, @productStock int, @productBarCode varchar(20), @productUnitPrice float, @productRecommendedRetailPrice float, @productTypicalWeightPerUnit float
+AS
+	declare
+		@error varchar(300),
+		@productExistsID int,
+		@brandExistsId int, 
+		@taxRateExistsId int, 
+		@productTypeExistsId int, 
+		@buyingPackageExistsId int, 
+		@sellingPackageExistsId int
+
+	set @productExistsID = Storage.udf_productExistsById(@productId)
+	set @brandExistsId = Storage.udf_brandExistsById(@brandId)
+	set @taxRateExistsId = Storage.udf_taxRateExistsById(@taxRateId) 
+	set @productTypeExistsId = Storage.udf_productTypeExistsById(@productTypeId)
+	set @buyingPackageExistsId = Storage.udf_packageExistsById(@buyingPackageId)
+	set @sellingPackageExistsId = Storage.udf_packageExistsById(@sellingPackageId)
+
+	if @productExistsID != 0 and @brandExistsId != 0 and @taxRateExistsId != 0 and @productTypeExistsId != 0 and @buyingPackageExistsId != 0 and @sellingPackageExistsId != 0
+	begin
+		update Storage.Product
+		set ProdBrandId = @brandId, ProdTaxRateId = @taxRateId, ProdProductTypeId = @productTypeId, ProdBuyingPackageId = @buyingPackageId, ProdSellingPackageId = @sellingPackageId, ProdName = @productName, ProdColor = @productColor, ProdSize = @productSize, ProdLeadTimeDays = @productLeadTimeDays, ProdQuantityPerOuter = @productQuantityPerOuter, ProdStock = @productStock, ProdBarCode = @productBarCode, ProdUnitPrice = @productUnitPrice, ProdRecommendedRetailPrice = @productRecommendedRetailPrice, ProdTypicalWeightPerUnit = @productTypicalWeightPerUnit
+		where ProdId = @productId
+	end
+	else
+	begin
+		if @productExistsID = 0
+		begin
+			set @error = 'Storage.product_update -> Não existe nenhum produto com este id (' + cast(@productId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+
+		if @brandExistsId = 0
+		begin
+			set @error = 'Storage.product_update -> Não existe nenhuma marca com este id (' + cast(@brandId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+
+		if @taxRateExistsId = 0
+		begin
+			set @error = 'Storage.product_update -> Não existe nenhuma taxa com este id (' + cast(@taxRateId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+
+		if @productTypeExistsId = 0
+		begin
+			set @error = 'Storage.product_update -> Não existe nenhum tipo de produto com este id (' + cast(@productTypeId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+
+		if @buyingPackageExistsId = 0
+		begin
+			set @error = 'Storage.product_update -> Não existe nenhum pacote com este id (Buying Package - ' + cast(@buyingPackageId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+
+		if @sellingPackageExistsId = 0
+		begin
+			set @error = 'Storage.product_update -> Não existe nenhum pacote com este id (Selling Package - ' + cast(@sellingPackageId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+GO
+--EXEC Storage.product_update 1, 3, 3, 4, 3, 3, '"The Gu" red shirt XML tag t-shirt (Black) 3XL', 'Black', '3XL', 7, 12, 0, 'N/A', 18.00, 26.91, 0.400;
+--EXEC Storage.product_update 1, 3, 3, 4, 3, 3, '"The Gu" red shirt XML tag t-shirt (Black) 3XL', 'Black', '3XL', 7, 12, 30, 'N/A', 18.00, 26.91, 0.400;
+--EXEC Storage.product_update 3, 3, 3, 4, 3, 3, '"The Gu" red shirt XML tag t-shirt (Black) 3XL', 'Black', '3XL', 7, 12, 30, 'N/A', 18.00, 26.91, 0.400;
+GO
+
+CREATE OR ALTER PROCEDURE Storage.product_delete @productId int
+AS
+	declare
+		@error varchar(300),
+		@productExistsID int
+		
+	set @productExistsID = Storage.udf_productExistsById(@productId)
+
+	if @productExistsID != 0
+	begin
+		delete from Storage.Product
+		where ProdId = @productId
+	end
+	else
+	begin
+		set @error = 'Storage.product_delete -> Não existe nenhum produto com este id (' + cast(@productId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC Storage.product_delete 1;
+--EXEC Storage.product_delete 3;
+GO
+
+/********************************************
+* Promotion
+********************************************/
+CREATE OR ALTER PROCEDURE Storage.promotion_insert @promotionDescription VARCHAR(100), @promotionStartDate VARCHAR(20), @promotionEndDate VARCHAR(20)
+AS
+	declare
+		@error varchar(300),
+		@promotionExistsID int
+
+	set @promotionExistsID = Storage.udf_promotionExists(@promotionDescription)
+
+	if @promotionExistsID = 0
+	begin
+		if CAST(@promotionStartDate AS date) < CAST(@promotionEndDate AS date)
+		begin
+			insert into Storage.Promotion values(@promotionDescription, CAST(@promotionStartDate AS date), CAST(@promotionEndDate AS date))
+		end
+		else
+		begin
+			set @error = 'Storage.promotion_insert -> Data de inicio maior que data de fim (' + @promotionStartDate + ' > ' + @promotionEndDate + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+	else
+	begin
+		set @error = 'Storage.promotion_insert -> Já existe uma promoção com esta descrição (' + @promotionDescription + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+EXEC Storage.promotion_insert 'Nova Promoção', '2022-08-25', '2032-08-25';
+--EXEC Storage.promotion_insert 'No Promotion', '2022-08-25', '2032-08-25';
+GO
+
+CREATE OR ALTER PROCEDURE Storage.promotion_update @promotionId int, @promotionDescription VARCHAR(100), @promotionStartDate VARCHAR(20), @promotionEndDate VARCHAR(20)
+AS
+	declare
+		@error varchar(300),
+		@promotionExistsID int
+
+	set @promotionExistsID = Storage.udf_promotionExistsById(@promotionId)
+
+	if @promotionExistsID != 0
+	begin
+		if CAST(@promotionStartDate AS date) < CAST(@promotionEndDate AS date)
+		begin
+			update Storage.Promotion
+			set PromDescription = @promotionDescription, PromStartDate = @promotionStartDate, PromEndDate = @promotionEndDate
+			where PromId = @promotionId
+		end
+		else
+		begin
+			set @error = 'Storage.promotion_insert -> Data de inicio maior que data de fim (' + @promotionStartDate + ' > ' + @promotionEndDate + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+	else
+	begin
+		set @error = 'Storage.promotion_update -> Não existe nenhuma promoção com este id (' + cast(@promotionId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC Storage.promotion_update 2, 'No Promotion', '2022-08-25', '2032-03-25';
+--EXEC Storage.promotion_update 2, 'No Promotion', '2022-08-25', '2032-08-25';
+--EXEC Storage.promotion_update 3, 'No Promotion', '2022-08-25', '2032-08-25';
+GO
+
+CREATE OR ALTER PROCEDURE Storage.promotion_delete @promotionId int
+AS
+	declare
+		@error varchar(300),
+		@promotionExistsID int
+		
+	set @promotionExistsID = Storage.udf_promotionExistsById(@promotionId)
+
+	if @promotionExistsID != 0
+	begin
+		delete from Storage.Promotion
+		where PromId = @promotionId
+	end
+	else
+	begin
+		set @error = 'Storage.promotion_delete -> Não existe nenhuma promoção com este id (' + cast(@promotionId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC Storage.promotion_delete 2;
+--EXEC Storage.promotion_delete 3;
+GO
+
+/********************************************
+* Product Promotion
+********************************************/
+CREATE OR ALTER PROCEDURE Storage.productPromotion_insert @productId int, @promotionId int
+AS
+	declare
+		@error varchar(300),
+		@productPromotionExistsID int,
+		@productExistsID int,
+		@promotionExistsID int
+		
+	set @productPromotionExistsID = Storage.udf_productPromotionExists(@productId, @promotionId)
+	set @productExistsID = Storage.udf_productExistsById(@productId)
+	set @promotionExistsID = Storage.udf_promotionExistsById(@promotionId)
+
+	if @productPromotionExistsID = 0 and @productExistsID != 0 and @promotionExistsID != 0
+	begin
+		insert into Storage.Product_Promotion(Prod_PromProductId, Prod_PromPromotionId) values(@productId, @promotionId)
+	end
+	else
+	begin
+		if @productpromotionExistsID != 0
+		begin
+			set @error = 'Storage.productPromotion_insert -> Já existe uma relação entre produto e promoção (' + cast(@productId as varchar(10)) + ', ' + cast(@promotionId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @productExistsID = 0
+		begin
+			set @error = 'Storage.productPromotion_insert -> Não existe nenhum produto com este id (' + cast(@productId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @promotionExistsID = 0
+		begin
+			set @error = 'Storage.productPromotion_insert -> Não existe nenhuma promoção com este id (' + cast(@promotionId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+GO
+EXEC Storage.productPromotion_insert 2, 1;
+--EXEC Storage.productPromotion_insert 3, 3;
+GO
+
+CREATE OR ALTER PROCEDURE Storage.productPromotion_update @productPromotionId int, @productId int, @promotionId int
+AS
+	declare
+		@error varchar(300),
+		@productPromotionExistsID int,
+		@productExistsID int,
+		@promotionExistsID int
+		
+	set @productPromotionExistsID = Storage.udf_productPromotionExistsById(@productPromotionId)
+	set @productExistsID = Storage.udf_productExistsById(@productId)
+	set @promotionExistsID = Storage.udf_promotionExistsById(@promotionId)
+
+	if @productPromotionExistsID != 0 and @productExistsID != 0 and @promotionExistsID != 0
+	begin
+		update Storage.Product_Promotion
+		set Prod_PromProductId = @productId, Prod_PromPromotionId = @promotionId
+		where Prod_PromProductPromotionId = @productpromotionId
+	end
+	else
+	begin
+		if @productpromotionExistsID = 0
+		begin
+			set @error = 'Storage.productPromotion_update -> Já existe uma relação entre produto e promoção este id (' + cast(@productPromotionId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @productExistsID = 0
+		begin
+			set @error = 'Storage.productPromotion_update -> Não existe nenhum produto com este id (' + cast(@productId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @promotionExistsID = 0
+		begin
+			set @error = 'Storage.productPromotion_update -> Não existe nenhuma promoção com este id (' + cast(@promotionId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+GO
+--EXEC Storage.productPromotion_update 2, 3, 1;
+--EXEC Storage.productPromotion_update 2, 3, 3;
+--EXEC Storage.productPromotion_update 3, 3, 3;
+GO
+
+CREATE OR ALTER PROCEDURE Storage.productPromotion_delete @productPromotionId int
+AS
+	declare
+		@error varchar(300),
+		@productPromotionExistsID int
+		
+	set @productPromotionExistsID = Storage.udf_productpromotionExistsById(@productPromotionId)
+
+	if @productPromotionExistsID != 0
+	begin
+		delete from Storage.Product_Promotion
+		where Prod_PromProductPromotionId = @productPromotionId
+	end
+	else
+	begin
+		set @error = 'Storage.productpromotion_delete -> Não existe nenhuma relação entre produto e promoção este id (' + cast(@productPromotionId as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC Storage.productPromotion_delete 2;
+--EXEC Storage.productPromotion_delete 3;
+GO
+
+/********************************************
+* Sale
+********************************************/
+CREATE OR ALTER PROCEDURE Sales.sale_insert @saleID int, @customerId int, @employeeId int, @saleDescription VARCHAR(100)
+AS
+	declare
+		@error varchar(300),
+		@saleExistsID int,
+		@customerExistsID int,
+		@employeeExistsID int
+
+	set @saleExistsID = Sales.udf_saleExistsById(@saleID)
+	set @customerExistsID = RH.udf_customerExistsById(@customerId)
+	set @employeeExistsID = RH.udf_employeeExistsById(@employeeId)
+
+
+	if @saleExistsID = 0 and @customerExistsID != 0 and @employeeExistsID != 0
+	begin
+		SET IDENTITY_INSERT Sales.Sale ON 
+		insert into Sales.Sale(SalID, SalCustomerId, SalEmployeeId, SalDescription, SalDate, SalIsFinished) values(@saleID, @customerId, @employeeId, @saleDescription, GETDATE(), 0)
+		SET IDENTITY_INSERT Sales.Sale OFF
+	end
+	else
+	begin
+		if @saleExistsID != 0
+		begin
+			set @error = 'Sales.sale_insert -> Já existe uma venda com este id (' + cast(@saleID as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @customerExistsID = 0
+		begin
+			set @error = 'Sales.sale_insert -> Não existe nenhum cliente com este id (' + cast(@customerId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @employeeExistsID = 0
+		begin
+			set @error = 'Sales.sale_insert -> Não existe nenhum funcionario com este id (' +cast( @employeeId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+GO
+EXEC Sales.sale_insert 1, 2, 3, 'Nova Venda';
+--EXEC Sales.sale_insert 2, 5, 6, 'Sale';
+GO
+
+CREATE OR ALTER PROCEDURE Sales.sale_update @saleID int, @customerId int, @employeeId int, @saleDescription VARCHAR(100)
+AS
+	declare
+		@error varchar(300),
+		@isFinished bit,
+		@saleExistsID int,
+		@customerExistsID int,
+		@employeeExistsID int
+		
+	set @saleExistsID = Sales.udf_saleExistsById(@saleID)
+	set @customerExistsID = RH.udf_customerExistsById(@customerId)
+	set @employeeExistsID = RH.udf_employeeExistsById(@employeeId)
+
+	if @saleExistsID != 0 and @customerExistsID != 0 and @employeeExistsID != 0
+	begin
+		set @isFinished = (select SalIsFinished from Sales.Sale where SalID = @saleID)
+		
+		if @isFinished = 0 
+		begin
+			update Sales.Sale
+			set SalCustomerId = @customerId, SalEmployeeId = @employeeId, SalDescription = @saleDescription
+			where SalID = @saleID
+		end
+		else
+		begin
+			set @error = 'Sales.sale_update -> A venda com este id já está fechada (' + cast(@saleID as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+	else
+	begin
+		if @saleExistsID = 0
+		begin
+			set @error = 'Sales.sale_update -> Não existe nenhuma venda com este id (' + cast(@saleID as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @customerExistsID = 0
+		begin
+			set @error = 'Sales.sale_update -> Não existe nenhum cliente com este id (' + cast(@customerId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @employeeExistsID = 0
+		begin
+			set @error = 'Sales.sale_update -> Não existe nenhum funcionario com este id (' +cast( @employeeId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+GO
+--EXEC Sales.sale_update 2, 5, 6, 'Sale4';
+--EXEC Sales.sale_update 2, 5, 6, 'Sale';
+--EXEC Sales.sale_update 3, 5, 6, 'Sale';
+GO
+
+CREATE OR ALTER PROCEDURE Sales.sale_delete @saleID int
+AS
+	declare
+		@error varchar(300),
+		@saleExistsID int
+		
+	set @saleExistsID = Sales.udf_saleExistsById(@saleID)
+
+	if @saleExistsID != 0
+	begin
+		delete from Sales.Sale
+		where SalID = @saleID
+	end
+	else
+	begin
+		set @error = 'Sales.sale_delete -> Não existe nenhuma venda com este id (' + cast(@saleID as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC Sales.sale_delete 2;
+--EXEC Sales.sale_delete 3;
+GO
+
+/********************************************
+* Product-Promotion Sale
+********************************************/
+CREATE OR ALTER PROCEDURE Sales.productPromotionSale_insert @productPromotionId int, @saleID int, @quantity int
+AS
+	declare
+		@error varchar(300),
+		@productId int,
+		@productStock int,
+		@productPromotionSaleExistsID int,
+		@productPromotionExistsID int,
+		@saleExistsID int
+
+	set @productPromotionSaleExistsID = Sales.udf_productPromotionSaleExists(@productPromotionId, @saleID)
+	set @productPromotionExistsID = Storage.udf_productPromotionExistsById(@productPromotionId)
+	set @saleExistsID = Sales.udf_saleExistsById(@saleID)
+
+	if @productPromotionSaleExistsID = 0 and @productPromotionExistsID != 0 and @saleExistsID != 0
+	begin
+		set @productStock = (select p.ProdStock from Storage.Product p join Storage.Product_Promotion pp on p.ProdId = pp.Prod_PromProductId where pp.Prod_PromProductPromotionId = @productPromotionExistsID)
+		set @productId = (select Prod_PromProductId from Storage.Product_Promotion where Prod_PromProductPromotionId = @productPromotionExistsID)
+		
+		if @quantity <= @productStock
+		begin
+			update Storage.Product
+			set ProdStock = (@productStock - @quantity)
+			where ProdId = @productId
+			
+			insert into Sales.ProductPromotion_Sale values(@productPromotionId, @saleID, @quantity)
+		end
+		else
+		begin
+			set @error = 'Sales.productPromotionSale_insert -> Quantidade maior que numero de produtos em stock (' + cast(@quantity as varchar(10)) + ' > '  + cast(@productStock as varchar(10)) +  ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+	else
+	begin
+		if @productPromotionSaleExistsID != 0
+		begin
+			set @error = 'Sales.productPromotionSale_insert -> Já existe uma relação entre produto-promoção e venda estes ids (' + cast(@productPromotionId as varchar(10)) + ', ' +cast( @saleID as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @productPromotionExistsID = 0
+		begin
+			set @error = 'Sales.productPromotionSale_insert -> Não existe nenhuma relação entre produto e promoção com este id (' + cast(@productPromotionId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @saleExistsID = 0
+		begin
+			set @error = 'Sales.productPromotionSale_insert -> Não existe nenhuma venda com este id (' +cast( @saleID as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+GO
+EXEC Sales.productPromotionSale_insert 1, 1, 3;
+--EXEC Sales.productPromotionSale_insert 4, 2, 6;
+GO
+
+CREATE OR ALTER PROCEDURE Sales.productPromotionSale_update @productPromotionId int, @saleID int, @quantity int
+AS
+	declare
+		@error varchar(300),
+		@productId int,
+		@productStock int,
+		@oldQuantity int,
+		@productPromotionSaleExistsID int,
+		@productPromotionExistsID int,
+		@saleExistsID int
+
+	set @productPromotionSaleExistsID = Sales.udf_productPromotionSaleExists(@productPromotionId, @saleID)
+	set @productPromotionExistsID = Storage.udf_productPromotionExistsById(@productPromotionId)
+	set @saleExistsID = Sales.udf_saleExistsById(@saleID)
+
+	if @productPromotionSaleExistsID != 0 and @productPromotionExistsID != 0 and @saleExistsID != 0
+	begin
+		set @productStock = (select p.ProdStock from Storage.Product p join Storage.Product_Promotion pp on p.ProdId = pp.Prod_PromProductId where pp.Prod_PromProductPromotionId = @productPromotionExistsID)
+		set @oldQuantity = (select ProdProm_SalQuantity from Sales.ProductPromotion_Sale where ProdProm_SalProductPromotionId = @productPromotionId and ProdProm_SalSaleId = @saleId)
+		set @productId = (select Prod_PromProductId from Storage.Product_Promotion where Prod_PromProductPromotionId = @productPromotionExistsID)
+
+		print '@quantity ' + cast(@quantity as varchar(10)) + ' @productStock ' + cast(@productStock as varchar(10)) + ' @oldQuantity ' + cast(@oldQuantity as varchar(10))
+		print '(@productStock + @oldQuantity) ' + cast((@productStock + @oldQuantity) as varchar(10))
+		print '((@productStock + @oldQuantity) - @quantity) ' + cast(((@productStock + @oldQuantity) - @quantity) as varchar(10))
+
+		if @quantity <= @productStock + @oldQuantity
+		begin
+			update Storage.Product
+			set ProdStock = ((@productStock + @oldQuantity) - @quantity)
+			where ProdId = @productId
+
+			update Sales.ProductPromotion_Sale
+			set ProdProm_SalQuantity = @quantity
+			where ProdProm_SalProductPromotionId = @productPromotionId and ProdProm_SalSaleId = @saleId
+		end
+		else
+		begin
+			set @error = 'Sales.productPromotionSale_update -> Quantidade maior que numero de produtos em stock (' + cast(@quantity as varchar(10)) + ' > '  + cast((@productStock + @oldQuantity) as varchar(10)) +  ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+	else
+	begin
+		if @productPromotionSaleExistsID = 0
+		begin
+			set @error = 'Sales.productPromotionSale_update -> Não existe nenhuma relação entre produto-promoção e venda estes ids (' + cast(@productPromotionId as varchar(10)) + ', ' +cast( @saleID as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @productPromotionExistsID = 0
+		begin
+			set @error = 'Sales.productPromotionSale_update -> Não existe nenhuma relação entre produto e promoção com este id (' + cast(@productPromotionId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+		
+		if @saleExistsID = 0
+		begin
+			set @error = 'Sales.productPromotionSale_update -> Não existe nenhuma venda com este id (' +cast( @saleID as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
+	end
+GO
+--EXEC Sales.productPromotionSale_update 4, 2, 2;
+--EXEC Sales.productPromotionSale_update 4, 2, 6;
+--EXEC Sales.productPromotionSale_update 5, 5, 6;
+GO
+
+CREATE OR ALTER PROCEDURE Sales.productPromotionSale_delete @productPromotionId int, @saleID int
+AS
+	declare
+		@error varchar(300),
+		@productPromotionSaleExistsID int
+		
+	set @productPromotionSaleExistsID = Sales.udf_productPromotionSaleExists(@productPromotionId, @saleID)
+
+	if @productPromotionSaleExistsID != 0
+	begin
+		delete from Sales.ProductPromotion_Sale
+		where ProdProm_SalProductPromotionId = @productPromotionId and ProdProm_SalSaleId = @saleId
+	end
+	else
+	begin
+		set @error = 'Sales.productPromotionSale_delete -> Não existe nenhuma relação entre produto-promoção e venda estes ids (' + cast(@productPromotionId as varchar(10)) + ', ' +cast( @saleID as varchar(10)) + ')'
+		RAISERROR (@error, 1, 1);
+		EXEC RH.errorLog_insert @error
+	end
+GO
+--EXEC Sales.productPromotionSale_delete 4, 2;
+--EXEC Sales.productPromotionSale_delete 5, 5;
+GO

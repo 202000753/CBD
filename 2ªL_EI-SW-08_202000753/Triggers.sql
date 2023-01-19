@@ -1,27 +1,29 @@
 /********************************************
- *	UC: Complementos de Bases de Dados 2022/2023
- *
- *	Projeto 1ª Fase - Criar os triggers
- *		Nuno Reis (202000753)
- *			Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
- *
- ********************************************/
+*	UC: Complementos de Bases de Dados 2022/2023
+*
+*	Projeto 2ª Fase - Criar os triggers
+*		Nuno Reis (202000753)
+*			Turma: 2ºL_EI-SW-08 - sala F155 (14:30h - 16:30h)
+*
+********************************************/
  --Trigger que altera avalidade de um token repetido
- CREATE or alter TRIGGER UsersInfo.tr_validade_token
- ON UsersInfo.Token
+ CREATE or alter TRIGGER RH.tr_validade_token
+ ON RH.Token
  AFTER INSERT
  AS
 	declare
 		@ID int,
 		@userID int,
 		@tokenID int,
-		@token int
+		@token int,
+		@tID int
 
 	set @ID = (select TokUserId from inserted)
+	set @tID = (select TokId from inserted)
 		
 	DECLARE tokenCursor CURSOR  
 		FOR SELECT TokUserId, TokToken
-		FROM UsersInfo.Token;
+		FROM RH.Token;
 	
 	OPEN tokenCursor 
 	FETCH NEXT FROM tokenCursor INTO 
@@ -30,15 +32,17 @@
 	
 	WHILE @@FETCH_STATUS = 0 
 	BEGIN
-		if UsersInfo.tokenExists(@userID, @token) != 0
+		if RH.udf_tokenExists(@token) != 0
 		begin
-			set @tokenID = UsersInfo.tokenExists(@userID, @token)
+			set @tokenID = RH.udf_tokenExists(@token)
 			
-			if @userID = @ID
+			if @userID = @ID and @tokenID != @tID
 			begin
-				update UsersInfo.Token
+				Exec RH.token_update @tokenID
+				
+				/*update RH.Token
 				set TokEndDateTime = GETDATE()
-				where TokId = @tokenID
+				where TokId = @tokenID*/
 			end
 		end
 
@@ -51,8 +55,8 @@
  GO
  
  --Trigger que elimina uma venda se forem removidos todos os produtos
- CREATE or alter TRIGGER SalesInfo.tr_eliminateSale
- ON SalesInfo.ProductPromotion_Sale
+ CREATE or alter TRIGGER Sales.tr_eliminateSale
+ ON Sales.ProductPromotion_Sale
  AFTER DELETE
  AS
 	declare
@@ -63,18 +67,20 @@
 	set @sID = (select ProdProm_SalSaleId from deleted)
 
 	set @n = (select COUNT(*)
-			  from SalesInfo.ProductPromotion_Sale
+			  from Sales.ProductPromotion_Sale
 			  where ProdProm_SalSaleId = @sID)
 		
 	if @n = 0
 	begin
-		DELETE FROM SalesInfo.Sale WHERE SalID = @sID
+		EXEC Sales.sale_delete @sID;
+
+		--DELETE FROM Sales.Sale WHERE SalID = @sID
 	end
  GO
  
 --Trigger que calcula a data prevista de entrega e os valores associados a uma venda finalizada
-CREATE or alter TRIGGER SalesInfo.tr_calculateSaleInfo
-ON SalesInfo.Sale
+CREATE or alter TRIGGER Sales.tr_calculateSaleInfo
+ON Sales.Sale
 FOR UPDATE
 AS
 	declare 
@@ -104,14 +110,14 @@ AS
 
 	DECLARE productsCursor CURSOR  
 		for select p.ProdLeadTimeDays, p.ProdUnitPrice, pps.ProdProm_SalQuantity, p.ProdRecommendedRetailPrice, tr.TaxRatTaxRate
-			from SalesInfo.ProductPromotion_Sale pps
-			join SalesInfo.Sale s
+			from Sales.ProductPromotion_Sale pps
+			join Sales.Sale s
 			on pps.ProdProm_SalSaleId = s.SalID
-			join ProductsInfo.Product_Promotion pp
+			join Storage.Product_Promotion pp
 			on pps.ProdProm_SalProductPromotionId = pp.Prod_PromProductPromotionId
-			join ProductsInfo.Product p
+			join Storage.Product p
 			on pp.Prod_PromProductId = p.ProdId
-			join ProductsInfo.TaxRate tr
+			join Storage.TaxRate tr
 			on p.ProdTaxRateId = tr.TaxRatId
 			where s.SalID = @salID
 
@@ -148,7 +154,7 @@ AS
 	set @salDate = DATEADD(day, @maxLeadTimeDays, GETDATE())
 	set @salTaxAmount = @salTotalPrice - @salTotalExculdingTax
 
-	update SalesInfo.Sale
+	update Sales.Sale
 	set SalDeliveryDate = @salDate, SalTotalExcludingTax = @salTotalExculdingTax, SalProfit = @salProfit, SalTotalPrice = @salTotalPrice, SalTaxAmount = @salTaxAmount
 	where SalID = @salID
 go

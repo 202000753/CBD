@@ -3,116 +3,116 @@
 *
 *	Projeto - Criação de Views
 *		Nuno Reis (202000753)
-*		Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
+*		Turma: 2ºL_EI-SW-08 - sala F155 (14:30h - 16:30h)
 *
 ********************************************/
-create or alter view UsersInfo.viewNorthAmericaCountry as
+create or alter view RH.viewNorthAmericaCountry as
 select *
-from UsersInfo.Country
+from RH.Country
 where CouContinent = 'North America';
 go
 select *
-from UsersInfo.viewNorthAmericaCountry;
+from RH.viewNorthAmericaCountry;
 go
 
-create or alter view UsersInfo.viewCitySalesTerritory as
+create or alter view RH.viewCitySalesTerritory as
 select distinct CitSalesTerritory
-from UsersInfo.City;
+from RH.City;
 go
 select *
-from UsersInfo.viewCitySalesTerritory;
+from RH.viewCitySalesTerritory;
 go
 
-create or alter view UsersInfo.viewRegion_Category as
+create or alter view RH.viewRegion_Category as
 select rc.Reg_CatId, co.CouName, co.CouContinent, s.StaProName, s.StaProCode, ci.CitName, ci.CitSalesTerritory, ci.CitLasPopulationRecord, ca.CatName, rc.Reg_CatPostalCode
-from UsersInfo.Region_Category rc
-join UsersInfo.StateProvince s
-on rc.Reg_CatCitStateProvinceId = s.StaProId
-join UsersInfo.City ci
+from RH.Region_Category rc
+join RH.StateProvince s
+on rc.Reg_CatStateProvinceId = s.StaProId
+join RH.City ci
 on rc.Reg_CatCityId = ci.CitId
-join UsersInfo.Category ca
+join RH.Category ca
 on rc.Reg_CatCategoryId = ca.CatId
-join UsersInfo.Country co
+join RH.Country co
 on rc.Reg_CatCountryId = co.CouId;
 go
 select *
-from UsersInfo.viewRegion_Category;
+from RH.viewRegion_Category;
 go
 
-create or alter view UsersInfo.viewCustomer as
+create or alter view RH.viewCustomer as
 select s.SysUseName, s.SysUseEmail, c.CusPrimaryContact, sy.SysUseName as 'Headquarters', ca.CatName, rc.Reg_CatPostalCode
-from UsersInfo.Customer c
-join UsersInfo.SysUser s
+from RH.Customer c
+join RH.SysUser s
 on c.CusUserId = s.SysUseId
-join UsersInfo.Customer cu
+join RH.Customer cu
 on c.CusHeadquartersId = cu.CusUserId
-join UsersInfo.SysUser sy
+join RH.SysUser sy
 on cu.CusUserId = sy.SysUseId
-join UsersInfo.Region_Category rc
+join RH.Region_Category rc
 on c.CusRegion_CategoryId = rc.Reg_CatId
-join UsersInfo.Category ca
+join RH.Category ca
 on rc.Reg_CatCategoryId = ca.CatId;
 go
 select *
-from UsersInfo.viewCustomer;
+from RH.viewCustomer;
 go
 
-create or alter view UsersInfo.viewEmployee as
+create or alter view RH.viewEmployee as
 select s.SysUseName, s.SysUseEmail, e.EmpPreferedName, CAST(CASE WHEN e.EmpIsSalesPerson = 1 THEN 'Yes' ELSE 'No' END AS varchar(20)) as 'Is Sales Person'
-from UsersInfo.Employee e
-join UsersInfo.SysUser s
+from RH.Employee e
+join RH.SysUser s
 on e.EmpUserId = s.SysUseId;
 go
 select *
-from UsersInfo.viewEmployee;
+from RH.viewEmployee;
 go
 
-create or alter view ProductsInfo.viewProduct as
+create or alter view Storage.viewProduct as
 select p.ProdName, b.BraName, t.TaxRatTaxRate, pt.ProTypName, ps.PacPackage as 'Selling Package', pb.PacPackage as 'Buying Package', p.ProdSize, p.ProdLeadTimeDays, p.ProdQuantityPerOuter, p.ProdUnitPrice, p.ProdRecommendedRetailPrice, p.ProdTypicalWeightPerUnit
-from ProductsInfo.Product p
-join ProductsInfo.Brand b
+from Storage.Product p
+join Storage.Brand b
 on p.ProdBrandId = b.BraId
-join ProductsInfo.TaxRate t
+join Storage.TaxRate t
 on p.ProdTaxRateId = t.TaxRatId
-join ProductsInfo.ProductType pt
+join Storage.ProductType pt
 on p.ProdProductTypeId = pt.ProTypId
-join ProductsInfo.Package ps
+join Storage.Package ps
 on p.ProdSellingPackageId = ps.PacId
-join ProductsInfo.Package pb
+join Storage.Package pb
 on p.ProdBuyingPackageId = pb.PacId;
 go
 select *
-from ProductsInfo.viewProduct;
+from Storage.viewProduct;
 go
 
-create or alter view ProductsInfo.viewProductPromotion as
+create or alter view Storage.viewProductPromotion as
 select p.ProdName, p.ProdUnitPrice, p.ProdRecommendedRetailPrice, pp.ProdNewPrice, pr.PromDescription, pr.PromStartDate as 'Start Date', pr.PromEndDate as 'End Date'
-from ProductsInfo.Product p
-join ProductsInfo.Product_Promotion pp
+from Storage.Product p
+join Storage.Product_Promotion pp
 on p.ProdId = pp.Prod_PromProductId
-join ProductsInfo.Promotion pr
+join Storage.Promotion pr
 on pp.Prod_PromPromotionId = pr.PromId;
 go
 select *
-from ProductsInfo.viewProductPromotion;
+from Storage.viewProductPromotion;
 go
 
-create or alter view SalesInfo.viewProductPromotionSale as
+create or alter view Sales.viewProductPromotionSale as
 select s.SalID, s.SalDate, s.SalDeliveryDate, s.SalTotalPrice, s.SalTotalExcludingTax, sc.SysUseName as 'Customer', se.SysUseName as 'Employee', p.ProdName, prs.ProdProm_SalQuantity, p.ProdUnitPrice, pr.PromDescription, pr.PromStartDate as 'Start Date', pr.PromEndDate as 'End Date'
-from ProductsInfo.Product p
-join ProductsInfo.Product_Promotion pp
+from Storage.Product p
+join Storage.Product_Promotion pp
 on p.ProdId = pp.Prod_PromProductId
-join ProductsInfo.Promotion pr
+join Storage.Promotion pr
 on pp.Prod_PromPromotionId = pr.PromId
-join SalesInfo.ProductPromotion_Sale prs
+join Sales.ProductPromotion_Sale prs
 on prs.ProdProm_SalProductPromotionId = pp.Prod_PromProductPromotionId
-join SalesInfo.Sale s
+join Sales.Sale s
 on prs.ProdProm_SalSaleId = s.SalID
-join UsersInfo.SysUser sc
+join RH.SysUser sc
 on s.SalCustomerId = sc.SysUseId
-join UsersInfo.SysUser se
+join RH.SysUser se
 on s.SalEmployeeId = se.SysUseId;
 go
 select *
-from SalesInfo.viewProductPromotionSale;
+from Sales.viewProductPromotionSale;
 go

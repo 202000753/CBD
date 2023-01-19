@@ -1,9 +1,9 @@
 /********************************************
 *	UC: Complementos de Bases de Dados 2022/2023
 *
-*	Projeto 1ª Fase - Criar os stored procedures de monitorização
+*	Projeto 2ª Fase - Criar os stored procedures de monitorização
 *		Nuno Reis (202000753)
-*			Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
+*			Turma: 2ºL_EI-SW-08 - sala F155 (14:30h - 16:30h)
 *
 ********************************************/
 --drop table dbo.MonitorizacaoColunas
@@ -48,26 +48,26 @@ AS
 			on c.object_id = o.parent_object_id
 			join sys.tables tbl
 			on c.object_id = tbl.object_id
-			where c.object_id = object_id('[UsersInfo].[Token]')
-					or c.object_id = object_id('[UsersInfo].[SysUser]')
-					or c.object_id = object_id('[UsersInfo].[StateProvince]')
-					or c.object_id = object_id('[UsersInfo].[Region_Category]')
-					or c.object_id = object_id('[UsersInfo].[ErrorLog]')
-					or c.object_id = object_id('[UsersInfo].[Employee]')
-					or c.object_id = object_id('[UsersInfo].[Customer]')
-					or c.object_id = object_id('[UsersInfo].[Country]')
-					or c.object_id = object_id('[UsersInfo].[City]')
-					or c.object_id = object_id('[UsersInfo].[Category]')
-					or c.object_id = object_id('[UsersInfo].[BuyingGroup]')
-					or c.object_id = object_id('[SalesInfo].[Sale]')
-					or c.object_id = object_id('[SalesInfo].[ProductPromotion_Sale]')
-					or c.object_id = object_id('[ProductsInfo].[TaxRate]')
-					or c.object_id = object_id('[ProductsInfo].[Promotion]')
-					or c.object_id = object_id('[ProductsInfo].[ProductType]')
-					or c.object_id = object_id('[ProductsInfo].[Product_Promotion]')
-					or c.object_id = object_id('[ProductsInfo].[Product]')
-					or c.object_id = object_id('[ProductsInfo].[Package]')
-					or c.object_id = object_id('[ProductsInfo].[Brand]')
+			where c.object_id = object_id('[RH].[Token]')
+					or c.object_id = object_id('[RH].[SysUser]')
+					or c.object_id = object_id('[RH].[StateProvince]')
+					or c.object_id = object_id('[RH].[Region_Category]')
+					or c.object_id = object_id('[RH].[ErrorLog]')
+					or c.object_id = object_id('[RH].[Employee]')
+					or c.object_id = object_id('[RH].[Customer]')
+					or c.object_id = object_id('[RH].[Country]')
+					or c.object_id = object_id('[RH].[City]')
+					or c.object_id = object_id('[RH].[Category]')
+					or c.object_id = object_id('[RH].[BuyingGroup]')
+					or c.object_id = object_id('[Sales].[Sale]')
+					or c.object_id = object_id('[Sales].[ProductPromotion_Sale]')
+					or c.object_id = object_id('[Storage].[TaxRate]')
+					or c.object_id = object_id('[Storage].[Promotion]')
+					or c.object_id = object_id('[Storage].[ProductType]')
+					or c.object_id = object_id('[Storage].[Product_Promotion]')
+					or c.object_id = object_id('[Storage].[Product]')
+					or c.object_id = object_id('[Storage].[Package]')
+					or c.object_id = object_id('[Storage].[Brand]')
 
 	OPEN selectCursor 
 	FETCH NEXT FROM selectCursor INTO 
@@ -105,7 +105,6 @@ go
 select *
 from dbo.v_LastMonitorizacaoColunas;
 go
-
 
 --drop table dbo.MonitorizacaoTabelas
 exec sp_MSForEachTable 'exec sp_spaceused [?]'

@@ -1,9 +1,9 @@
 /********************************************
 *	UC: Complementos de Bases de Dados 2022/2023
 *
-*	Projeto 1ª Fase - Criar os stored procedures geradores
+*	Projeto 2ª Fase - Criar os stored procedures geradores
 *		Nuno Reis (202000753)
-*			Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
+*			Turma: 2ºL_EI-SW-08 - sala F155 (14:30h - 16:30h)
 *
 ********************************************/
 /********************************************
@@ -27,7 +27,6 @@ AS
 
 	set @countryExistsID = RH.udf_countryExists(@countryName, @continentName)
 
-
 	if @countryExistsID = 0
 	begin
 		insert into RH.Country values(@countryName, @continentName)
@@ -39,23 +38,34 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
-EXEC RH.country_insert 'Portugal', 'Europe';
---EXEC RH.country_insert 'United States', 'North America';
+--EXEC RH.country_insert 'Espanha', 'Europe';
 GO
 
 CREATE OR ALTER PROCEDURE RH.country_update @countryId int, @countryName varchar(20), @continentName varchar(20)
 AS
 	declare
 		@error varchar(300),
-		@countryExistsID int
+		@countryExistsID int,
+		@oldCountryExistsID int
 
 	set @countryExistsID = RH.udf_countryExistsById(@countryId)
 
 	if @countryExistsID != 0
 	begin
-		update RH.Country
-		set CouName = @countryName, CouContinent = @continentName
-		where CouId = @countryId
+		set @oldCountryExistsID = RH.udf_countryExists(@countryName, @continentName)
+		
+		if @oldCountryExistsID = 0
+		begin
+			update RH.Country
+			set CouName = @countryName, CouContinent = @continentName
+			where CouId = @countryId
+		end
+		else
+		begin
+			set @error = 'RH.country_update -> Já existe um pais com este nome e continente (' + @countryName + ', ' + @continentName + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
 	end
 	else
 	begin
@@ -64,9 +74,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC RH.country_update 2, 'United States', 'South America';
---EXEC RH.country_update 3, 'United States', 'North America';
---EXEC RH.country_update 2, 'United States', 'South America';
+--EXEC RH.country_update 1, 'Portugal', 'Europe';
 GO
 
 CREATE OR ALTER PROCEDURE RH.country_delete @countryId int
@@ -89,8 +97,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC RH.country_delete 2;
---EXEC RH.country_delete 3;
+--EXEC RH.country_delete 1;
 GO
 
 /********************************************
@@ -104,7 +111,6 @@ AS
 
 	set @stateProvinceExistsID = RH.udf_stateProvinceExists(@stateProvinceName)
 
-
 	if @stateProvinceExistsID = 0
 	begin
 		insert into RH.StateProvince values(@stateProvinceName, @stateProvinceCode)
@@ -116,15 +122,15 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
-EXEC RH.stateProvince_insert 'Setubal', 'Se';
---EXEC RH.stateProvince_insert 'Alabama', 'AL';
+--EXEC RH.stateProvince_insert 'Faro', 'Fa';
 GO
 
 CREATE OR ALTER PROCEDURE RH.stateProvince_update @stateProvinceId int, @stateProvinceName varchar(50), @stateProvinceCode varchar(5)
 AS
 	declare
 		@error varchar(300),
-		@stateProvinceExistsID int
+		@stateProvinceExistsID int,
+		@oldStateProvinceExistsID int
 
 	set @stateProvinceExistsID = RH.udf_stateProvinceExistsById(@stateProvinceId)
 
@@ -141,9 +147,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC RH.stateProvince_update 3, 'Alabama', 'AL';
---EXEC RH.stateProvince_update 2, 'Alabama', 'AL';
---EXEC RH.stateProvince_update 2, 'Alabama', 'AK';
+--EXEC RH.stateProvince_update 1, 'Setubal', 'Se';
 GO
 
 CREATE OR ALTER PROCEDURE RH.stateProvince_delete @stateProvinceId int
@@ -166,8 +170,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC RH.stateProvince_delete 2;
---EXEC RH.stateProvince_delete 3;
+--EXEC RH.stateProvince_delete 1;
 GO
 
 /********************************************
@@ -181,7 +184,6 @@ AS
 
 	set @cityExistsID = RH.udf_cityExists(@cityName)
 
-
 	if @cityExistsID = 0
 	begin
 		insert into RH.City values(@cityName, @citySalesTerritory, @cityLastPopulationRecord)
@@ -193,15 +195,15 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
-EXEC RH.city_insert 'Setubal', 'Mideast', 613;
---EXEC RH.city_insert 'Aaronsburg', 'Mideast', 613;
+--EXEC RH.city_insert 'Almada', 'North', 613;
 GO
 
 CREATE OR ALTER PROCEDURE RH.city_update @cityId int, @cityName varchar(50), @citySalesTerritory varchar(50), @cityLastPopulationRecord int
 AS
 	declare
 		@error varchar(300),
-		@cityExistsID int
+		@cityExistsID int,
+		@oldCityExistsID int
 
 	set @cityExistsID = RH.udf_cityExistsById(@cityId)
 
@@ -218,9 +220,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC RH.city_update 3, 'Aaronsburg', 'Mideast', 613;
---EXEC RH.city_update 2, 'Aaronsburg', 'Southeast', 613;
---EXEC RH.city_update 2, 'Aaronsburg', 'Mideast', 613;
+--EXEC RH.city_update 1, 'Setubal', 'Center', 613;
 GO
 
 CREATE OR ALTER PROCEDURE RH.city_delete @cityId int
@@ -243,8 +243,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC RH.city_delete 2;
---EXEC RH.city_delete 3;
+--EXEC RH.city_delete 1;
 GO
 
 /********************************************
@@ -258,7 +257,6 @@ AS
 
 	set @categoryExistsID = RH.udf_categoryExists(@categoryName)
 
-
 	if @categoryExistsID = 0
 	begin
 		insert into RH.Category values(@categoryName)
@@ -270,23 +268,34 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
-EXEC RH.category_insert 'Bike Shop';
---EXEC RH.category_insert '24H Shop';
+--EXEC RH.category_insert 'Bike Shop';
 GO
 
 CREATE OR ALTER PROCEDURE RH.category_update @categoryId int, @categoryName varchar(50)
 AS
 	declare
 		@error varchar(300),
-		@categoryExistsID int
+		@categoryExistsID int,
+		@oldCategoryExistsID int
 
 	set @categoryExistsID = RH.udf_categoryExistsById(@categoryId)
 
 	if @categoryExistsID != 0
 	begin
-		update RH.Category
-		set CatName = @categoryName
-		where CatId = @categoryId
+		set @oldCategoryExistsID = RH.udf_categoryExists(@categoryName)
+		
+		if @oldCategoryExistsID = 0
+		begin
+			update RH.Category
+			set CatName = @categoryName
+			where CatId = @categoryId
+		end
+		else
+		begin
+			set @error = 'RH.category_update -> Já existe uma categoria com este nome (' + @categoryName + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
 	end
 	else
 	begin
@@ -295,9 +304,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC RH.category_update 3, '24H Shop';
---EXEC RH.category_update 2, 'Quiosk';
---EXEC RH.category_update 2, '24H Shop';
+--EXEC RH.category_update 1, 'Bike Shop';
 GO
 
 CREATE OR ALTER PROCEDURE RH.category_delete @categoryId int
@@ -321,7 +328,6 @@ AS
 	end
 GO
 --EXEC RH.category_delete 2;
---EXEC RH.category_delete 3;
 GO
 
 /********************************************
@@ -342,7 +348,6 @@ AS
 	set @stateProvinceExistsId = RH.udf_stateProvinceExistsById(@stateProvinceId) 
 	set @cityExistsId = RH.udf_cityExistsById(@cityId)
 	set @categoryExistsId = RH.udf_categoryExistsById(@categoryId)
-
 
 	if @regionCategoryExistsID = 0 and @countryExistsId != 0 and @stateProvinceExistsId != 0 and @cityExistsId != 0 and @categoryExistsId != 0
 	begin
@@ -386,8 +391,7 @@ AS
 		end
 	end
 GO
-EXEC RH.regionCategory_insert 1, 1, 1, 1, 2344;
---EXEC RH.regionCategory_insert 3, 3, 3, 3, 2344;
+--EXEC RH.regionCategory_insert 1, 1, 1, 1, 2344;
 GO
 
 CREATE OR ALTER PROCEDURE RH.regionCategory_update @regionCategoryId int, @countryId int, @stateProvinceId int, @cityId int, @categoryId int, @postalCode int
@@ -398,7 +402,8 @@ AS
 		@countryExistsId int, 
 		@stateProvinceExistsId int, 
 		@cityExistsId int, 
-		@categoryExistsId int
+		@categoryExistsId int,
+		@oldRegionCategoryExistsID int
 
 	set @regionCategoryExistsID = RH.udf_regionCategoryExistsById(@regionCategoryId)
 	set @countryExistsId = RH.udf_countryExistsById(@countryId)
@@ -423,36 +428,34 @@ AS
 
 		if @countryExistsId = 0
 		begin
-			set @error = 'RH.regionCategory_insert -> Não existe nenhum pais com este id (' + cast(@countryId as varchar(10)) + ')'
+			set @error = 'RH.regionCategory_update -> Não existe nenhum pais com este id (' + cast(@countryId as varchar(10)) + ')'
 			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 
 		if @stateProvinceExistsId = 0
 		begin
-			set @error = 'RH.regionCategory_insert -> Não existe nenhum estado com este id (' + cast(@stateProvinceId as varchar(10)) + ')'
+			set @error = 'RH.regionCategory_update -> Não existe nenhum estado com este id (' + cast(@stateProvinceId as varchar(10)) + ')'
 			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 
 		if @cityExistsId = 0
 		begin
-			set @error = 'RH.regionCategory_insert -> Não existe nenhuma cidade com este id (' + cast(@cityId as varchar(10)) + ')'
+			set @error = 'RH.regionCategory_update -> Não existe nenhuma cidade com este id (' + cast(@cityId as varchar(10)) + ')'
 			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 
 		if @categoryExistsId = 0
 		begin
-			set @error = 'RH.regionCategory_insert -> Não existe nenhuma categoria com este id (' + cast(@categoryId as varchar(10)) + ')'
+			set @error = 'RH.regionCategory_update -> Não existe nenhuma categoria com este id (' + cast(@categoryId as varchar(10)) + ')'
 			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
 	end
 GO
 --EXEC RH.regionCategory_update 2, 1, 1, 1, 1, 2344;
---EXEC RH.regionCategory_update 2, 3, 3, 3, 3, 2346;
---EXEC RH.regionCategory_update 3, 1, 1, 1, 1, 2344;
 GO
 
 CREATE OR ALTER PROCEDURE RH.regionCategory_delete @regionCategoryId int
@@ -476,7 +479,6 @@ AS
 	end
 GO
 --EXEC RH.regionCategory_delete 2;
---EXEC RH.regionCategory_delete 3;
 GO
 
 /********************************************
@@ -490,7 +492,6 @@ AS
 
 	set @buiyngGroupExistsID = RH.udf_buiyngGroupExists(@buiyngGroupName)
 
-
 	if @buiyngGroupExistsID = 0
 	begin
 		insert into RH.BuyingGroup values(@buiyngGroupName)
@@ -502,23 +503,34 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
-EXEC RH.buiyngGroup_insert 'IPS';
---EXEC RH.buiyngGroup_insert 'Tailspin Toys';
+--EXEC RH.buiyngGroup_insert 'P';
 GO
 
 CREATE OR ALTER PROCEDURE RH.buiyngGroup_update @buiyngGroupId int, @buiyngGroupName varchar(50)
 AS
 	declare
 		@error varchar(300),
-		@buiyngGroupExistsID int
+		@buiyngGroupExistsID int,
+		@oldBuiyngGroupExistsID int
 
 	set @buiyngGroupExistsID = RH.udf_buiyngGroupExistsById(@buiyngGroupId)
 
 	if @buiyngGroupExistsID != 0
 	begin
-		update RH.BuyingGroup
-		set BuyGrouName = @buiyngGroupName
-		where BuyGrouId = @buiyngGroupId
+		set @oldBuiyngGroupExistsID = RH.udf_buiyngGroupExists(@buiyngGroupName)
+
+		if @oldBuiyngGroupExistsID = 0
+		begin
+			update RH.BuyingGroup
+			set BuyGrouName = @buiyngGroupName
+			where BuyGrouId = @buiyngGroupId
+		end
+		else
+		begin
+			set @error = 'RH.buiyngGroup_update -> Já existe um grupo com este nome (' + @buiyngGroupName + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
 	end
 	else
 	begin
@@ -527,9 +539,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC RH.buiyngGroup_update 3, 'Tailspin Toys';
---EXEC RH.buiyngGroup_update 2, 'Wingtip Toys';
---EXEC RH.buiyngGroup_update 2, 'Tailspin Toys';
+--EXEC RH.buiyngGroup_update 2, 'P';
 GO
 
 CREATE OR ALTER PROCEDURE RH.buiyngGroup_delete @buiyngGroupId int
@@ -553,7 +563,6 @@ AS
 	end
 GO
 --EXEC RH.buiyngGroup_delete 2;
---EXEC RH.buiyngGroup_delete 3;
 GO
 
 /********************************************
@@ -567,7 +576,6 @@ AS
 
 	set @sysUserExistsID = RH.udf_sysUserExists(@sysUserEmail)
 
-
 	if @sysUserExistsID = 0
 	begin
 		insert into RH.SysUser values(@sysUserEmail, (RH.udf_fnHashPassword(@sysUserPassword)), @sysUserName)
@@ -579,18 +587,15 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
-EXEC RH.sysUser_insert 'IPS (Head Office)', 'ips@ips.com', 'Pass123';
-EXEC RH.sysUser_insert 'EST', 'est@ips.com', 'Pass123';
-EXEC RH.sysUser_insert 'Nuno Reis', 'nunoreis@ips.com', 'Pass123';
---EXEC RH.sysUser_insert 'Tailspin Toys (Head Office)', 'HeadOffice@Tailspin_Toys.com', 'Pass123';
---EXEC RH.sysUser_insert 'Eva Muirden', 'Eva_Muirden@employees.com', 'Pass123';
+--EXEC RH.sysUser_insert 'IPS', 'ips@ips.com', 'Pass123';
 GO
 
 CREATE OR ALTER PROCEDURE RH.sysUser_update @sysUserId int, @sysUserName varchar(50), @sysUserEmail varchar(50), @sysUserPassword varchar(50) 
 AS
 	declare
 		@error varchar(300),
-		@sysUserExistsID int
+		@sysUserExistsID int,
+		@oldSysUserExistsID int
 
 	set @sysUserExistsID = RH.udf_sysUserExistsById(@sysUserId)
 
@@ -607,9 +612,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC RH.sysUser_update 5, 'Tailspin Toys (Head Office)', 'HeadOffice@Tailspin_Toys.com', 'Pass123';
---EXEC RH.sysUser_update 4, 'Tailspin Toys', 'HeadOffice@Tailspin_Toys.com', 'Pass123';
---EXEC RH.sysUser_update 4, 'Tailspin Toys (Head Office)', 'HeadOffice@Tailspin_Toys.com', 'Pass123';
+--EXEC RH.sysUser_update 1, 'IPS(Head Office)', 'ips@ips.com', 'Pass123';
 GO
 
 CREATE OR ALTER PROCEDURE RH.sysUser_delete @sysUserId int
@@ -632,14 +635,13 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC RH.sysUser_delete 4;
---EXEC RH.sysUser_delete 5;
+--EXEC RH.sysUser_delete 2;
 GO
 
 /********************************************
 * Customer
 ********************************************/
-CREATE OR ALTER PROCEDURE RH.customer_insert @userId int, @headquartersId int, @regionCategoryId int, @buyingGroupId int, @primaryContact varchar(40)
+CREATE OR ALTER PROCEDURE RH.customer_insert @userId int, @headquartersId int, @regionCategoryId int, @buyingGroupId int, @primaryContact varchar(40), @isHeadOficce bit
 AS
 	declare
 		@error varchar(300),
@@ -656,6 +658,12 @@ AS
 	set @regionCategoryExistsId = RH.udf_regionCategoryExistsById(@regionCategoryId)
 	set @buyingGroupExistsId = RH.udf_buiyngGroupExistsById(@buyingGroupId)
 	set @employeeExistsID = RH.udf_employeeExistsById(@userId)
+
+	if @isHeadOficce = 1
+	begin
+		set @headquartersId = @userId
+		set @headquartersExistsId = @userId
+	end
 
 	if @customerExistsID = 0 and @userExistsId != 0 and @headquartersExistsId != 0 and @regionCategoryExistsId != 0 and @buyingGroupExistsId != 0 and @employeeExistsID = 0
 	begin
@@ -706,9 +714,7 @@ AS
 		end
 	end
 GO
-EXEC RH.customer_insert 2, 1, 1, 1, 'João Sousa';
---EXEC RH.customer_insert 5, 1, 3, 3, 'Nuno Reis';
---EXEC RH.customer_insert 7, 1, 1, 1, 'Nuno Reis';
+--EXEC RH.customer_insert 10, 1, 1, 1, 'João Sousa', 1;
 GO
 
 CREATE OR ALTER PROCEDURE RH.customer_update @userId int, @headquartersId int, @regionCategoryId int, @buyingGroupId int, @primaryContact varchar(40)
@@ -720,7 +726,8 @@ AS
 		@headquartersExistsId int,
 		@regionCategoryExistsId int,
 		@buyingGroupExistsId int,
-		@employeeExistsID int
+		@employeeExistsID int,
+		@oldCustomerExistsID int
 
 	set @customerExistsID = RH.udf_customerExistsById(@userId)
 	set @userExistsId = RH.udf_sysUserExistsById(@userId)
@@ -729,7 +736,7 @@ AS
 	set @buyingGroupExistsId = RH.udf_buiyngGroupExistsById(@buyingGroupId)
 	set @employeeExistsID = RH.udf_employeeExistsById(@userId)
 
-	if @customerExistsID != 0 and @userExistsId != 0 and @headquartersExistsId != 0 and @regionCategoryExistsId != 0 and @buyingGroupExistsId != 0 and @employeeExistsID != 0
+	if @customerExistsID != 0 and @userExistsId != 0 and @headquartersExistsId != 0 and @regionCategoryExistsId != 0 and @buyingGroupExistsId != 0 and @employeeExistsID = 0
 	begin
 		update RH.Customer
 		set CusHeadquartersId = @headquartersId, CusRegion_CategoryId = @regionCategoryId, CusBuyingGroupId = @buyingGroupId, CusPrimaryContact = @primaryContact
@@ -780,9 +787,7 @@ AS
 		end
 	end
 GO
---EXEC RH.customer_update 6, 2, 10, 2, 'Nuno Reis';
---EXEC RH.customer_update 5, 1, 3, 1, 'Nuno Reis';
---EXEC RH.customer_update 5, 1, 3, 3, 'Nuno Reis';
+--EXEC RH.customer_update 1, 10, 1, 1, 'João Sousa';
 GO
 
 CREATE OR ALTER PROCEDURE RH.customer_delete @userId int
@@ -805,8 +810,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC RH.customer_delete 5;
---EXEC RH.customer_delete 6;
+--EXEC RH.customer_delete 1;
 GO
 
 /********************************************
@@ -843,8 +847,7 @@ AS
 		end
 	end
 GO
-EXEC RH.employee_insert 3, 'Nuno', 1;
---EXEC RH.employee_insert 6, 'Eva', 1;
+--EXEC RH.employee_insert 4, 'Nuno', 1;
 GO
 
 CREATE OR ALTER PROCEDURE RH.employee_update @userId int, @employeePreferedName VARCHAR(10), @employeeIsSalesPerson BIT
@@ -880,9 +883,7 @@ AS
 		end
 	end
 GO
---EXEC RH.employee_update 7, 'Eva', 1;
---EXEC RH.employee_update 6, 'Eva', 0;
---EXEC RH.employee_update 6, 'Eva', 1;
+--EXEC RH.employee_update 4, 'Nuno', 1;
 GO
 
 CREATE OR ALTER PROCEDURE RH.employee_delete @userId int
@@ -905,8 +906,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC RH.employee_delete 6;
---EXEC RH.employee_delete 7;
+--EXEC RH.employee_delete 5;
 GO
 
 /********************************************
@@ -951,8 +951,7 @@ AS
 		end
 	end
 GO
-EXEC RH.token_insert 3;
---EXEC RH.token_insert 6;
+--EXEC RH.token_insert 4;
 GO
 
 CREATE OR ALTER PROCEDURE RH.token_update @tokenId int
@@ -977,7 +976,6 @@ AS
 	end
 GO
 --EXEC RH.token_update 3;
---EXEC RH.token_update 2;
 GO
 
 /********************************************
@@ -991,7 +989,6 @@ AS
 
 	set @taxRateExistsID = Storage.udf_taxRateExists(@taxRate)
 
-
 	if @taxRateExistsID = 0
 	begin
 		insert into Storage.TaxRate values(@taxRate)
@@ -1003,23 +1000,34 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
-EXEC Storage.taxRate_insert 3.2;
---EXEC Storage.taxRate_insert 2.2;
+--EXEC Storage.taxRate_insert 3.2;
 GO
 
 CREATE OR ALTER PROCEDURE Storage.taxRate_update @taxRateId int, @taxRate float
 AS
 	declare
 		@error varchar(300),
-		@taxRateExistsID int
+		@taxRateExistsID int,
+		@oldTaxRateExistsID int
 
 	set @taxRateExistsID = Storage.udf_taxRateExistsById(@taxRateId)
 
 	if @taxRateExistsID != 0
 	begin
-		update Storage.TaxRate
-		set TaxRatTaxRate = @taxRate
-		where TaxRatId = @taxRateId
+		set @oldTaxRateExistsID = Storage.udf_taxRateExists(@taxRate)
+
+		if @oldTaxRateExistsID = 0
+		begin
+			update Storage.TaxRate
+			set TaxRatTaxRate = @taxRate
+			where TaxRatId = @taxRateId
+		end
+		else
+		begin
+			set @error = 'Storage.taxRate_update -> Já existe uma taxa com este valor (' + cast(@taxRate as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
 	end
 	else
 	begin
@@ -1028,9 +1036,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC Storage.taxRate_update 2, 2.7;
---EXEC Storage.taxRate_update 2, 2.2;
---EXEC Storage.taxRate_update 3, 2.2;
+--EXEC Storage.taxRate_update 2, 3.2;
 GO
 
 CREATE OR ALTER PROCEDURE Storage.taxRate_delete @taxRateId int
@@ -1054,7 +1060,6 @@ AS
 	end
 GO
 --EXEC Storage.taxRate_delete 2;
---EXEC Storage.taxRate_delete 3;
 GO
 
 /********************************************
@@ -1068,7 +1073,6 @@ AS
 
 	set @productTypeExistsID = Storage.udf_productTypeExists(@productType)
 
-
 	if @productTypeExistsID = 0
 	begin
 		insert into Storage.ProductType values(@productType)
@@ -1080,23 +1084,34 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
-EXEC Storage.productType_insert 'Seco';
---EXEC Storage.productType_insert 'Chiller';
+--EXEC Storage.productType_insert 'Molhado';
 GO
 
 CREATE OR ALTER PROCEDURE Storage.productType_update @productTypeId int, @productType VARCHAR(25)
 AS
 	declare
 		@error varchar(300),
-		@productTypeExistsID int
+		@productTypeExistsID int,
+		@oldProductTypeExistsID int
 
 	set @productTypeExistsID = Storage.udf_productTypeExistsById(@productTypeId)
 
 	if @productTypeExistsID != 0
 	begin
-		update Storage.ProductType
-		set ProTypName = @productType
-		where ProTypId = @productTypeId
+		set @oldProductTypeExistsID = Storage.udf_productTypeExists(@productType)
+
+		if @oldProductTypeExistsID = 0
+		begin
+			update Storage.ProductType
+			set ProTypName = @productType
+			where ProTypId = @productTypeId
+		end
+		else
+		begin
+			set @error = 'Storage.productType_update -> Já existe um tipo de produto com este nome (' + @productType + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
 	end
 	else
 	begin
@@ -1105,9 +1120,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC Storage.productType_update 2, 'Dry';
---EXEC Storage.productType_update 2, 'Chiller';
---EXEC Storage.productType_update 3, 'Chiller';
+--EXEC Storage.productType_update 1, 'Congelado';
 GO
 
 CREATE OR ALTER PROCEDURE Storage.productType_delete @productTypeId int
@@ -1131,7 +1144,6 @@ AS
 	end
 GO
 --EXEC Storage.productType_delete 2;
---EXEC Storage.productType_delete 1;
 GO
 
 /********************************************
@@ -1145,7 +1157,6 @@ AS
 
 	set @packageExistsID = Storage.udf_packageExists(@package)
 
-
 	if @packageExistsID = 0
 	begin
 		insert into Storage.Package values(@package)
@@ -1157,23 +1168,34 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
-EXEC Storage.package_insert 'Pacote';
---EXEC Storage.package_insert 'Bag';
+--EXEC Storage.package_insert 'Pacote';
 GO
 
 CREATE OR ALTER PROCEDURE Storage.package_update @packageId int, @package VARCHAR(25)
 AS
 	declare
 		@error varchar(300),
-		@packageExistsID int
+		@packageExistsID int,
+		@oldPackageExistsID int
 
 	set @packageExistsID = Storage.udf_packageExistsById(@packageId)
 
 	if @packageExistsID != 0
 	begin
-		update Storage.Package
-		set PacPackage = @package
-		where PacId = @packageId
+		set @oldPackageExistsID = Storage.udf_packageExists(@package)
+
+		if @oldPackageExistsID = 0
+		begin
+			update Storage.Package
+			set PacPackage = @package
+			where PacId = @packageId
+		end
+		else
+		begin
+			set @error = 'Storage.package_update -> Já existe um pacote com este nome (' + @package + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
 	end
 	else
 	begin
@@ -1182,9 +1204,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC Storage.package_update 2, 'Packet';
---EXEC Storage.package_update 2, 'Bag';
---EXEC Storage.package_update 3, 'Bag';
+--EXEC Storage.package_update 1, 'Saco';
 GO
 
 CREATE OR ALTER PROCEDURE Storage.package_delete @packageId int
@@ -1208,7 +1228,6 @@ AS
 	end
 GO
 --EXEC Storage.package_delete 2;
---EXEC Storage.package_delete 3;
 GO
 
 /********************************************
@@ -1222,7 +1241,6 @@ AS
 
 	set @brandExistsID = Storage.udf_brandExists(@brand)
 
-
 	if @brandExistsID = 0
 	begin
 		insert into Storage.Brand values(@brand)
@@ -1234,23 +1252,34 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
-EXEC Storage.brand_insert 'Nike';
---EXEC Storage.brand_insert 'Northwind';
+--EXEC Storage.brand_insert 'Nike';
 GO
 
 CREATE OR ALTER PROCEDURE Storage.brand_update @brandId int, @brand VARCHAR(25)
 AS
 	declare
 		@error varchar(300),
-		@brandExistsID int
+		@brandExistsID int,
+		@oldBrandExistsID int
 
 	set @brandExistsID = Storage.udf_brandExistsById(@brandId)
 
 	if @brandExistsID != 0
 	begin
-		update Storage.Brand
-		set BraName = @brand
-		where BraId = @brandId
+		set @oldBrandExistsID = Storage.udf_brandExists(@brand)
+
+		if @oldBrandExistsID = 0
+		begin
+			update Storage.Brand
+			set BraName = @brand
+			where BraId = @brandId
+		end
+		else
+		begin
+			set @error = 'Storage.brand_update -> Já existe uma marca com este nome (' + @brand + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
 	end
 	else
 	begin
@@ -1259,9 +1288,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC Storage.brand_update 2, 'N/A';
---EXEC Storage.brand_update 2, 'Northwind';
---EXEC Storage.brand_update 3, 'Northwind';
+--EXEC Storage.brand_update 1, 'New Balance';
 GO
 
 CREATE OR ALTER PROCEDURE Storage.brand_delete @brandId int
@@ -1285,7 +1312,6 @@ AS
 	end
 GO
 --EXEC Storage.brand_delete 2;
---EXEC Storage.brand_delete 3;
 GO
 
 /********************************************
@@ -1308,7 +1334,6 @@ AS
 	set @productTypeExistsId = Storage.udf_productTypeExistsById(@productTypeId)
 	set @buyingPackageExistsId = Storage.udf_packageExistsById(@buyingPackageId)
 	set @sellingPackageExistsId = Storage.udf_packageExistsById(@sellingPackageId)
-
 
 	if @productExistsID = 0 and @brandExistsId != 0 and @taxRateExistsId != 0 and @productTypeExistsId != 0 and @buyingPackageExistsId != 0 and @sellingPackageExistsId != 0
 	begin
@@ -1359,8 +1384,7 @@ AS
 		end
 	end
 GO
-EXEC Storage.product_insert 1, 1, 5, 1, 1, 'Tenís AirForce', 'Preto', '46', 7, 12, 30, 'N/A', 18.00, 26.91, 0.400;
---EXEC Storage.product_insert 3, 3, 4, 3, 3, '"The Gu" red shirt XML tag t-shirt (Black) 3XL', 'Black', '3XL', 7, 12, 30, 'N/A', 18.00, 26.91, 0.400;
+--EXEC Storage.product_insert 1, 1, 1, 1, 1, 'Tenís AirForce', 'Preto', '46', 7, 12, 30, 'N/A', 18.00, 26.91, 0.400;
 GO
 
 CREATE OR ALTER PROCEDURE Storage.product_update @productId int, @brandId int, @taxRateId int, @productTypeId int, @buyingPackageId int, @sellingPackageId int, @productName varchar(100), @productColor varchar(50), @productSize varchar(20), @productLeadTimeDays int, @productQuantityPerOuter int, @productStock int, @productBarCode varchar(20), @productUnitPrice float, @productRecommendedRetailPrice float, @productTypicalWeightPerUnit float
@@ -1432,9 +1456,7 @@ AS
 		end
 	end
 GO
---EXEC Storage.product_update 1, 3, 3, 4, 3, 3, '"The Gu" red shirt XML tag t-shirt (Black) 3XL', 'Black', '3XL', 7, 12, 0, 'N/A', 18.00, 26.91, 0.400;
---EXEC Storage.product_update 1, 3, 3, 4, 3, 3, '"The Gu" red shirt XML tag t-shirt (Black) 3XL', 'Black', '3XL', 7, 12, 30, 'N/A', 18.00, 26.91, 0.400;
---EXEC Storage.product_update 3, 3, 3, 4, 3, 3, '"The Gu" red shirt XML tag t-shirt (Black) 3XL', 'Black', '3XL', 7, 12, 30, 'N/A', 18.00, 26.91, 0.400;
+--EXEC Storage.product_update 1, 1, 1, 1, 1, 1, 'Calções', 'Preto', 'L', 7, 12, 30, 'N/A', 18.00, 26.91, 0.400;
 GO
 
 CREATE OR ALTER PROCEDURE Storage.product_delete @productId int
@@ -1457,8 +1479,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC Storage.product_delete 1;
---EXEC Storage.product_delete 3;
+--EXEC Storage.product_delete 2;
 GO
 
 /********************************************
@@ -1492,15 +1513,15 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
-EXEC Storage.promotion_insert 'Nova Promoção', '2022-08-25', '2032-08-25';
---EXEC Storage.promotion_insert 'No Promotion', '2022-08-25', '2032-08-25';
+--EXEC Storage.promotion_insert 'Nova Promoção', '2022-08-25', '2032-08-25';
 GO
 
 CREATE OR ALTER PROCEDURE Storage.promotion_update @promotionId int, @promotionDescription VARCHAR(100), @promotionStartDate VARCHAR(20), @promotionEndDate VARCHAR(20)
 AS
 	declare
 		@error varchar(300),
-		@promotionExistsID int
+		@promotionExistsID int,
+		@oldPromotionExistsID int
 
 	set @promotionExistsID = Storage.udf_promotionExistsById(@promotionId)
 
@@ -1526,9 +1547,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC Storage.promotion_update 2, 'No Promotion', '2022-08-25', '2032-03-25';
---EXEC Storage.promotion_update 2, 'No Promotion', '2022-08-25', '2032-08-25';
---EXEC Storage.promotion_update 3, 'No Promotion', '2022-08-25', '2032-08-25';
+--EXEC Storage.promotion_update 1, 'No Promotion', '2022-08-25', '2032-03-25';
 GO
 
 CREATE OR ALTER PROCEDURE Storage.promotion_delete @promotionId int
@@ -1551,8 +1570,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC Storage.promotion_delete 2;
---EXEC Storage.promotion_delete 3;
+--EXEC Storage.promotion_delete 1;
 GO
 
 /********************************************
@@ -1598,8 +1616,7 @@ AS
 		end
 	end
 GO
-EXEC Storage.productPromotion_insert 2, 1;
---EXEC Storage.productPromotion_insert 3, 3;
+--EXEC Storage.productPromotion_insert 1, 1;
 GO
 
 CREATE OR ALTER PROCEDURE Storage.productPromotion_update @productPromotionId int, @productId int, @promotionId int
@@ -1608,7 +1625,8 @@ AS
 		@error varchar(300),
 		@productPromotionExistsID int,
 		@productExistsID int,
-		@promotionExistsID int
+		@promotionExistsID int,
+		@oldProductPromotionExistsID int
 		
 	set @productPromotionExistsID = Storage.udf_productPromotionExistsById(@productPromotionId)
 	set @productExistsID = Storage.udf_productExistsById(@productId)
@@ -1616,15 +1634,26 @@ AS
 
 	if @productPromotionExistsID != 0 and @productExistsID != 0 and @promotionExistsID != 0
 	begin
-		update Storage.Product_Promotion
-		set Prod_PromProductId = @productId, Prod_PromPromotionId = @promotionId
-		where Prod_PromProductPromotionId = @productpromotionId
+		set @oldProductPromotionExistsID = Storage.udf_productPromotionExists(@productId, @promotionId)
+		
+		if @oldProductPromotionExistsID = 0
+		begin
+			update Storage.Product_Promotion
+			set Prod_PromProductId = @productId, Prod_PromPromotionId = @promotionId
+			where Prod_PromProductPromotionId = @productpromotionId
+		end
+		else
+		begin
+			set @error = 'Storage.productPromotion_update -> Já existe uma relação entre produto e promoção (' + cast(@productId as varchar(10)) + ', ' + cast(@promotionId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
 	end
 	else
 	begin
 		if @productpromotionExistsID = 0
 		begin
-			set @error = 'Storage.productPromotion_update -> Já existe uma relação entre produto e promoção este id (' + cast(@productPromotionId as varchar(10)) + ')'
+			set @error = 'Storage.productPromotion_update -> Não existe nenhuma relação entre produto e promoção este id (' + cast(@productPromotionId as varchar(10)) + ')'
 			RAISERROR (@error, 1, 1);
 			EXEC RH.errorLog_insert @error
 		end
@@ -1644,9 +1673,7 @@ AS
 		end
 	end
 GO
---EXEC Storage.productPromotion_update 2, 3, 1;
---EXEC Storage.productPromotion_update 2, 3, 3;
---EXEC Storage.productPromotion_update 3, 3, 3;
+--EXEC Storage.productPromotion_update 1, 1, 1;
 GO
 
 CREATE OR ALTER PROCEDURE Storage.productPromotion_delete @productPromotionId int
@@ -1669,8 +1696,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC Storage.productPromotion_delete 2;
---EXEC Storage.productPromotion_delete 3;
+--EXEC Storage.productPromotion_delete 1;
 GO
 
 /********************************************
@@ -1682,18 +1708,29 @@ AS
 		@error varchar(300),
 		@saleExistsID int,
 		@customerExistsID int,
-		@employeeExistsID int
+		@employeeExistsID int,
+		@employeeType bit
 
 	set @saleExistsID = Sales.udf_saleExistsById(@saleID)
 	set @customerExistsID = RH.udf_customerExistsById(@customerId)
 	set @employeeExistsID = RH.udf_employeeExistsById(@employeeId)
 
-
 	if @saleExistsID = 0 and @customerExistsID != 0 and @employeeExistsID != 0
 	begin
-		SET IDENTITY_INSERT Sales.Sale ON 
-		insert into Sales.Sale(SalID, SalCustomerId, SalEmployeeId, SalDescription, SalDate, SalIsFinished) values(@saleID, @customerId, @employeeId, @saleDescription, GETDATE(), 0)
-		SET IDENTITY_INSERT Sales.Sale OFF
+		set @employeeType = (select EmpIsSalesPerson from RH.Employee where EmpUserId = @employeeId)
+		
+		if @employeeType = 1
+		begin
+			SET IDENTITY_INSERT Sales.Sale ON 
+			insert into Sales.Sale(SalID, SalCustomerId, SalEmployeeId, SalDescription, SalDate, SalIsFinished) values(@saleID, @customerId, @employeeId, @saleDescription, GETDATE(), 0)
+			SET IDENTITY_INSERT Sales.Sale OFF
+		end
+		else
+		begin
+			set @error = 'Sales.sale_insert -> O funcionario não pode fazer vendas (' + cast(@employeeId as varchar(10)) + ')'
+			RAISERROR (@error, 1, 1);
+			EXEC RH.errorLog_insert @error
+		end
 	end
 	else
 	begin
@@ -1719,8 +1756,7 @@ AS
 		end
 	end
 GO
-EXEC Sales.sale_insert 1, 2, 3, 'Nova Venda';
---EXEC Sales.sale_insert 2, 5, 6, 'Sale';
+--EXEC Sales.sale_insert 1, 3, 4, 'Nova Venda';
 GO
 
 CREATE OR ALTER PROCEDURE Sales.sale_update @saleID int, @customerId int, @employeeId int, @saleDescription VARCHAR(100)
@@ -1730,7 +1766,8 @@ AS
 		@isFinished bit,
 		@saleExistsID int,
 		@customerExistsID int,
-		@employeeExistsID int
+		@employeeExistsID int,
+		@employeeType bit
 		
 	set @saleExistsID = Sales.udf_saleExistsById(@saleID)
 	set @customerExistsID = RH.udf_customerExistsById(@customerId)
@@ -1742,9 +1779,20 @@ AS
 		
 		if @isFinished = 0 
 		begin
-			update Sales.Sale
-			set SalCustomerId = @customerId, SalEmployeeId = @employeeId, SalDescription = @saleDescription
-			where SalID = @saleID
+			set @employeeType = (select EmpIsSalesPerson from RH.Employee where EmpUserId = @employeeId)
+		
+			if @employeeType = 1
+			begin
+				update Sales.Sale
+				set SalCustomerId = @customerId, SalEmployeeId = @employeeId, SalDescription = @saleDescription
+				where SalID = @saleID
+			end
+			else
+			begin
+				set @error = 'Sales.sale_insert -> O funcionario não pode fazer vendas (' + cast(@employeeId as varchar(10)) + ')'
+				RAISERROR (@error, 1, 1);
+				EXEC RH.errorLog_insert @error
+			end
 		end
 		else
 		begin
@@ -1777,9 +1825,7 @@ AS
 		end
 	end
 GO
---EXEC Sales.sale_update 2, 5, 6, 'Sale4';
---EXEC Sales.sale_update 2, 5, 6, 'Sale';
---EXEC Sales.sale_update 3, 5, 6, 'Sale';
+--EXEC Sales.sale_update 1, 3, 4, 'Sale4';
 GO
 
 CREATE OR ALTER PROCEDURE Sales.sale_delete @saleID int
@@ -1802,8 +1848,7 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC Sales.sale_delete 2;
---EXEC Sales.sale_delete 3;
+--EXEC Sales.sale_delete 1;
 GO
 
 /********************************************
@@ -1867,8 +1912,7 @@ AS
 		end
 	end
 GO
-EXEC Sales.productPromotionSale_insert 1, 1, 3;
---EXEC Sales.productPromotionSale_insert 4, 2, 6;
+--EXEC Sales.productPromotionSale_insert 1, 1, 1;
 GO
 
 CREATE OR ALTER PROCEDURE Sales.productPromotionSale_update @productPromotionId int, @saleID int, @quantity int
@@ -1880,7 +1924,8 @@ AS
 		@oldQuantity int,
 		@productPromotionSaleExistsID int,
 		@productPromotionExistsID int,
-		@saleExistsID int
+		@saleExistsID int,
+		@oldProductPromotionSaleExistsID int
 
 	set @productPromotionSaleExistsID = Sales.udf_productPromotionSaleExists(@productPromotionId, @saleID)
 	set @productPromotionExistsID = Storage.udf_productPromotionExistsById(@productPromotionId)
@@ -1891,10 +1936,6 @@ AS
 		set @productStock = (select p.ProdStock from Storage.Product p join Storage.Product_Promotion pp on p.ProdId = pp.Prod_PromProductId where pp.Prod_PromProductPromotionId = @productPromotionExistsID)
 		set @oldQuantity = (select ProdProm_SalQuantity from Sales.ProductPromotion_Sale where ProdProm_SalProductPromotionId = @productPromotionId and ProdProm_SalSaleId = @saleId)
 		set @productId = (select Prod_PromProductId from Storage.Product_Promotion where Prod_PromProductPromotionId = @productPromotionExistsID)
-
-		print '@quantity ' + cast(@quantity as varchar(10)) + ' @productStock ' + cast(@productStock as varchar(10)) + ' @oldQuantity ' + cast(@oldQuantity as varchar(10))
-		print '(@productStock + @oldQuantity) ' + cast((@productStock + @oldQuantity) as varchar(10))
-		print '((@productStock + @oldQuantity) - @quantity) ' + cast(((@productStock + @oldQuantity) - @quantity) as varchar(10))
 
 		if @quantity <= @productStock + @oldQuantity
 		begin
@@ -1937,21 +1978,30 @@ AS
 		end
 	end
 GO
---EXEC Sales.productPromotionSale_update 4, 2, 2;
---EXEC Sales.productPromotionSale_update 4, 2, 6;
---EXEC Sales.productPromotionSale_update 5, 5, 6;
+--EXEC Sales.productPromotionSale_update 1, 1, 1;
 GO
 
 CREATE OR ALTER PROCEDURE Sales.productPromotionSale_delete @productPromotionId int, @saleID int
 AS
 	declare
 		@error varchar(300),
-		@productPromotionSaleExistsID int
+		@productPromotionSaleExistsID int,
+		@productId int,
+		@productStock int,
+		@oldQuantity int
 		
 	set @productPromotionSaleExistsID = Sales.udf_productPromotionSaleExists(@productPromotionId, @saleID)
 
 	if @productPromotionSaleExistsID != 0
 	begin
+		set @productStock = (select p.ProdStock from Storage.Product p join Storage.Product_Promotion pp on p.ProdId = pp.Prod_PromProductId where pp.Prod_PromProductPromotionId = @productPromotionId)
+		set @oldQuantity = (select ProdProm_SalQuantity from Sales.ProductPromotion_Sale where ProdProm_SalProductPromotionId = @productPromotionId and ProdProm_SalSaleId = @saleId)
+		set @productId = (select Prod_PromProductId from Storage.Product_Promotion where Prod_PromProductPromotionId = @productPromotionId)
+
+		update Storage.Product
+		set ProdStock = @productStock + @oldQuantity
+		where ProdId = @productId
+
 		delete from Sales.ProductPromotion_Sale
 		where ProdProm_SalProductPromotionId = @productPromotionId and ProdProm_SalSaleId = @saleId
 	end
@@ -1962,6 +2012,5 @@ AS
 		EXEC RH.errorLog_insert @error
 	end
 GO
---EXEC Sales.productPromotionSale_delete 4, 2;
---EXEC Sales.productPromotionSale_delete 5, 5;
+--EXEC Sales.productPromotionSale_delete 1, 1;
 GO

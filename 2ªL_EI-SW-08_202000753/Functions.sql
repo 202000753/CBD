@@ -1,9 +1,9 @@
 /********************************************
 *	UC: Complementos de Bases de Dados 2022/2023
 *
-*	Projeto 1ª Fase - Criar as functions
+*	Projeto 2ª Fase - Criar as functions
 *		Nuno Reis (202000753)
-*			Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
+*			Turma: 2ºL_EI-SW-08 - sala F155 (14:30h - 16:30h)
 *
 ********************************************/
 --Função que retorna o id do pais e 0 se não existir o pais com o nome e continente passados
@@ -67,6 +67,27 @@ BEGIN
 END;
 --select RH.udf_stateProvinceExists('Alabama');
 --select RH.udf_stateProvinceExists('Alaska');
+GO
+
+--Função que retorna o id do estado e 0 se não existir o estado com o codigo passado
+CREATE OR ALTER FUNCTION RH.udf_stateProvinceExistsByCode (@stateProvinceCode varchar(50))
+RETURNS int
+BEGIN
+	declare @result int
+
+	set @result =(select StaProId
+				  from RH.StateProvince
+				  where StaProCode = @stateProvinceCode)
+
+	if @result is null
+	begin
+		return 0
+	end
+	
+	return @result
+END;
+--select RH.udf_stateProvinceExistsByCode('Al');
+--select RH.udf_stateProvinceExistsByCode('Ab');
 GO
 
 --Função que retorna o id do estado e 0 se não existir o estado com o id passado
@@ -277,6 +298,27 @@ END;
 --select RH.udf_sysUserExists('Kiosk_SylvaniteMT@Tailspin_Toys.com');
 GO
 
+--Função que retorna o id do utilizador e 0 se não existir o utilizador com o email passado
+CREATE OR ALTER FUNCTION RH.udf_sysUserExistsByName (@sysUserName varchar(50))
+RETURNS int
+BEGIN
+	declare @result int
+
+	set @result =(select SysUseId
+				  from RH.SysUser
+				  where SysUseName = @sysUserName)
+
+	if @result is null
+	begin
+		return 0
+	end
+	
+	return @result
+END;
+--select RH.udf_sysUserExists('HeadOffice@Tailspin_Toys.com');
+--select RH.udf_sysUserExists('Kiosk_SylvaniteMT@Tailspin_Toys.com');
+GO
+
 --Função que retorna o id do grupo e 0 se não existir o grupo com o id passado
 CREATE OR ALTER FUNCTION RH.udf_sysUserExistsById (@sysUserId int)
 RETURNS int
@@ -404,6 +446,27 @@ BEGIN
 	set @result =(select TokId
 				  from RH.Token
 				  where TokToken = @token)
+
+	if @result is null
+	begin
+		return 0
+	end
+	
+	return @result
+END;
+--select RH.udf_tokenExists(66873);
+--select RH.udf_tokenExists(66874);
+GO
+
+--Função que retorna o id do token e 0 se não existir o token com o token passado
+CREATE OR ALTER FUNCTION RH.udf_tokenExistsByUser (@token int, @userId int)
+RETURNS int
+BEGIN
+	declare @result int
+
+	set @result =(select TokId
+				  from RH.Token
+				  where TokToken = @token and TokUserId = @userId and DATEDIFF(second, GETDATE(), TokDateTime) < 0 and DATEDIFF(second, GETDATE(), TokEndDateTime) > 0)
 
 	if @result is null
 	begin

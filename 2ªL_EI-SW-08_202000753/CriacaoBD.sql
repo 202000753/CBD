@@ -1,34 +1,33 @@
 /********************************************
 *	UC: Complementos de Bases de Dados 2022/2023
 *
-*	Projeto 1ª Fase - Criação do Layout
+*	Projeto 2ª Fase - Criação do Layout
 *	Nuno Reis (202000753)
-*			Turma: 2ºL_EI-SW-08 - sala F155 (12:30h - 16:30h)
+*			Turma: 2ºL_EI-SW-08 - sala F155 (14:30h - 16:30h)
 *
 ********************************************/
 USE master
 
 --DROP DATABASE WWIGlobal
 CREATE DATABASE WWIGlobal
-go
-/*ON 
+ON 
 ( NAME = WWIGlobal_Readdat,
 	FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\WWIGlobalReaddat.mdf',
 	SIZE = 2 MB,
-	MAXSIZE = 10 MB,
-	FILEGROWTH = 1 MB ),
+	MAXSIZE = 6 MB,
+	FILEGROWTH = 2 MB ),
 ( NAME = WWIGlobal2_Writedat,
 	FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\WWIGlobal2Writedat.mdf',
-	SIZE = 2 MB,
-	MAXSIZE = 10 MB,
-	FILEGROWTH = 1 MB )
+	SIZE = 15 MB,
+	MAXSIZE = 45 MB,
+	FILEGROWTH = 15 MB )
 LOG ON
 ( NAME = WWIGlobal_log,
 	FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\WWIGloballog.ldf',
 	SIZE = 2 MB,
 	MAXSIZE = 10 MB,
 	FILEGROWTH = 1 MB ) ;
-GO*/
+GO;
 
 USE WWIGlobal
 GO

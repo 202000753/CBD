@@ -102,7 +102,6 @@ go
 /********************************************
 *	Indices
 ********************************************/
---Com vista à otimização da execução das consultas propostas, defina, justificadamente, os índices pertinentes. Inclua no relatório a justificação apresentada.
 
 
 --SQL Profiler e Tunning Advisor
@@ -110,3 +109,59 @@ go
 queries equivalentes sobre a base de dados original. No caso da nova base de dados devem ser 
 apresentados os planos de execução com e sem índices. Inclua no relatório o comentário ao que 
 observa.*/
+/********************************************
+*	1
+********************************************/
+SET ANSI_PADDING ON
+
+CREATE NONCLUSTERED INDEX [_dta_index_City_6_645577338__K1_K2] ON [RH].[City]
+(
+	[CitId] ASC,
+	[CitName] ASC
+)WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF) ON [PRIMARY]
+
+CREATE NONCLUSTERED INDEX [_dta_index_Sale_6_1365579903__K2_K3_8] ON [Sales].[Sale]
+(
+	[SalCustomerId] ASC,
+	[SalEmployeeId] ASC
+)
+INCLUDE([SalTotalPrice]) WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF) ON [PRIMARY]
+
+/********************************************
+*	2
+********************************************/
+/*SET ANSI_PADDING ON
+
+CREATE NONCLUSTERED INDEX [_dta_index_Sale_6_1365579903__K2_K3_8] ON [Sales].[Sale]
+(
+	[SalCustomerId] ASC,
+	[SalEmployeeId] ASC
+)
+INCLUDE([SalTotalPrice]) WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF) ON [PRIMARY]*/
+
+
+/********************************************
+*	3
+********************************************/
+CREATE NONCLUSTERED INDEX [_dta_index_ProductPromotion_Sale_6_1429580131__K1] ON [Sales].[ProductPromotion_Sale]
+(
+	[ProdProm_SalProductPromotionId] ASC
+)WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF) ON [PRIMARY]
+
+
+
+/*Pesquisa de vendas por cidade. Deve ser retornado o nome da cidade, o nome do vendedor, o total de vendas (nota: cidades com o mesmo nome mas de diferentes
+estão deverão ser consideradas distintas);*/
+select *
+from dbo.viewSalesPerCity;
+go
+
+--Para as vendas calcular a taxa de crescimento de cada ano, face ao ano anterior, por categoria de cliente;
+select *
+from dbo.viewYearGrowthPerSale;
+go
+
+--Nº de produtos (stockItem) nas vendas por cor
+select *
+from dbo.viewNProductsPerColor;
+go
